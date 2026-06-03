@@ -35,7 +35,6 @@ from crtsh_recon.display import (
 )
 from crtsh_recon.exceptions import ValidationError
 
-
 # ---------------------------------------------------------------------------
 # Argument parser
 # ---------------------------------------------------------------------------
