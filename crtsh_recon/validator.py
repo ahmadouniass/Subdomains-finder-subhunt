@@ -10,9 +10,7 @@ from .exceptions import ValidationError
 logger = logging.getLogger(__name__)
 
 # RFC-1123 compliant domain regex (apex only — no leading wildcard or scheme)
-_APEX_DOMAIN_RE = re.compile(
-    r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
-)
+_APEX_DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$")
 
 # Accepted export format identifiers
 VALID_FORMATS = {"txt", "json", "csv"}

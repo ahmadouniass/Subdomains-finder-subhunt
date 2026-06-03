@@ -20,9 +20,7 @@ def _ensure_output_dir(directory: str) -> Path:
     try:
         path.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
-        raise ExportError(
-            f"Cannot create output directory {directory!r}: {exc}"
-        ) from exc
+        raise ExportError(f"Cannot create output directory {directory!r}: {exc}") from exc
     return path
 
 

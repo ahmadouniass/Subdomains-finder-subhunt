@@ -89,9 +89,7 @@ class CRTClient:
         except requests.exceptions.ConnectionError as exc:
             raise CRTClientError(f"Connection failed: {exc}") from exc
         except requests.exceptions.Timeout as exc:
-            raise CRTClientError(
-                f"Request timed out after {self.timeout}s: {exc}"
-            ) from exc
+            raise CRTClientError(f"Request timed out after {self.timeout}s: {exc}") from exc
         except requests.exceptions.RequestException as exc:
             raise CRTClientError(f"Unexpected request error: {exc}") from exc
 
@@ -108,9 +106,7 @@ class CRTClient:
         if response.status_code == 429:
             raise CRTRateLimitError("crt.sh rate limit reached. Try again later.")
         if not response.ok:
-            raise CRTClientError(
-                f"crt.sh returned HTTP {response.status_code} for domain {domain}"
-            )
+            raise CRTClientError(f"crt.sh returned HTTP {response.status_code} for domain {domain}")
 
         try:
             data = response.json()
