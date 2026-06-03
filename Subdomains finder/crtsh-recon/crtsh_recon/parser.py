@@ -14,8 +14,8 @@ _DOMAIN_RE = re.compile(
     r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
 )
 
-# Wildcard prefix produced by crt.sh (e.g. "*.example.com")
-_WILDCARD_PREFIX = re.compile(r"^\*\.")
+# Wildcard prefix produced by crt.sh (e.g. "%.example.com")
+_WILDCARD_PREFIX = re.compile(r"^\%\.")
 
 
 def _split_name_value(raw: str) -> Iterator[str]:

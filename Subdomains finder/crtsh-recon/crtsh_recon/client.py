@@ -37,7 +37,7 @@ def _build_session(retries: int, backoff: float) -> requests.Session:
         {
             "User-Agent": (
                 "crtsh-recon/1.0.0 (OSINT Subdomain Enumeration Tool; "
-                "https://github.com/yourhandle/crtsh-recon)"
+                "https://github.com/ahmadouniass/Cyber-tools)"
             ),
             "Accept": "application/json",
         }

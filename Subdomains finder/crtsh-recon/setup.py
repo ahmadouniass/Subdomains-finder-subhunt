@@ -20,8 +20,8 @@ LONG_DESCRIPTION = (HERE / "README.md").read_text(encoding="utf-8")
 setup(
     name="crtsh-recon",
     version="1.0.0",
-    author="yourhandle",
-    author_email="yourhandle@example.com",
+    author="ahmed_tripping",
+    author_email="ahmadouniass2@gmail.com",
     description="Professional subdomain enumeration via crt.sh Certificate Transparency logs",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
