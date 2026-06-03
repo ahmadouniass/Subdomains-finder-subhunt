@@ -1,0 +1,62 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+MANIFEST
+
+# ─── Virtual environments ─────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+.env
+env.bak/
+venv.bak/
+
+# ─── Packaging ────────────────────────────────────────────
+.Python
+pip-log.txt
+.tox/
+.nox/
+
+# ─── Testing & coverage ───────────────────────────────────
+.pytest_cache/
+.cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+nosetests.xml
+
+# ─── IDE / éditeurs ───────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ─── Projet : outputs & logs ──────────────────────────────
+output/
+logs/
+
+# ─── Secrets ──────────────────────────────────────────────
+.env
+.env.*
+secrets.yaml
+secrets.json
+config.local.py
+
+# ─── Mypy / type checkers ─────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
