@@ -1,9 +1,0 @@
-amp.seneweb.com.seneweb.com
-docker.seneweb.com
-front.seneweb.com
-image.seneweb.com
-images.seneweb.com.seneweb.com
-k8s.seneweb.com
-seneweb.com
-www.seneweb.com
-www1.seneweb.com
