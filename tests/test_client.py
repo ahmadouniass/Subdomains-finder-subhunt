@@ -94,7 +94,7 @@ class TestFetchCertificates:
 class TestContextManager:
     def test_context_manager_closes_session(self):
         with CRTClient() as c:
-            with patch.object(c.session, "close") as mock_close:
+            with patch.object(c.session, "close"):
                 pass
         # __exit__ calls self.close() which calls session.close()
         # We can't assert after the with block has already exited, so test

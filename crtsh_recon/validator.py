@@ -4,7 +4,6 @@ validator.py — Input validation helpers.
 
 import re
 import logging
-from typing import Optional
 
 from .exceptions import ValidationError
 

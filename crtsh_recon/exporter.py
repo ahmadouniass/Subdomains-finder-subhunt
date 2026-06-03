@@ -5,7 +5,6 @@ exporter.py — Write subdomain results to TXT, JSON and CSV files.
 import csv
 import json
 import logging
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional

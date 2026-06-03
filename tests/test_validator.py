@@ -3,7 +3,7 @@ tests/test_validator.py — Unit tests for crtsh_recon.validator
 """
 
 import pytest
-from crtsh_recon.validator import validate_domain, validate_formats, VALID_FORMATS
+from crtsh_recon.validator import validate_domain, validate_formats
 from crtsh_recon.exceptions import ValidationError
 
 

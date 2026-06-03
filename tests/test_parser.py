@@ -2,7 +2,6 @@
 tests/test_parser.py — Unit tests for crtsh_recon.parser
 """
 
-import pytest
 from crtsh_recon.parser import (
     extract_subdomains,
     _strip_wildcard,

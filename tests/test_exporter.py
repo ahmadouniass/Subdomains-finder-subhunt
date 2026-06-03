@@ -5,10 +5,8 @@ tests/test_exporter.py — Unit tests for crtsh_recon.exporter
 import csv
 import json
 import pytest
-from pathlib import Path
 
 from crtsh_recon.exporter import export_txt, export_json, export_csv, export_results
-from crtsh_recon.exceptions import ExportError
 
 
 DOMAIN = "example.com"

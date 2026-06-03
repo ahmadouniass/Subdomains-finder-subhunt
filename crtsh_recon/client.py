@@ -4,7 +4,6 @@ client.py — CRT.sh HTTP client with retry logic and timeout handling.
 
 import time
 import logging
-from typing import Optional
 
 import requests
 from requests.adapters import HTTPAdapter
