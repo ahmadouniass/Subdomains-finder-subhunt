@@ -65,3 +65,5 @@ config.local.py
 .dmypy.json
 dmypy.json
 .pytype/
+.coverage
+coverage.xml
