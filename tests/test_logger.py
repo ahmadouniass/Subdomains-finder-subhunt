@@ -65,10 +65,13 @@ class TestSetupLogging:
         root = logging.getLogger(_ROOT_LOGGER)
         assert not any(isinstance(h, RotatingFileHandler) for h in root.handlers)
 
-    def test_invalid_log_dir_does_not_crash(self):
-        # Should log a warning but not raise
-        setup_logging(log_dir="/invalid/path/that/cannot/be/created\x00", log_to_file=True)
-
+    def test_invalid_log_dir_does_not_crash(self, tmp_path):
+        # Simulate an unwritable directory
+        import stat
+        locked = tmp_path / "locked"
+        locked.mkdir()
+        locked.chmod(stat.S_IRUSR)  # read-only
+        setup_logging(log_dir=str(locked / "subdir"), log_to_file=True)
 
 class TestGetLogger:
     def test_returns_logger_instance(self):
