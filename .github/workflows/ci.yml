@@ -36,7 +36,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov
 
-      - name: Run tests with coverage
+      - name: Run tests with coverage (Linux / macOS)
+        if: runner.os != 'Windows'
         run: |
           pytest tests/ -v \
             --tb=short \
@@ -44,6 +45,10 @@ jobs:
             --cov-report=term-missing \
             --cov-report=xml \
             --cov-fail-under=80
+
+      - name: Run tests with coverage (Windows)
+        if: runner.os == 'Windows'
+        run: pytest tests/ -v --tb=short --cov=crtsh_recon --cov-report=term-missing --cov-report=xml --cov-fail-under=80
 
       - name: Upload coverage report
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
@@ -73,11 +78,7 @@ jobs:
           pip install flake8 black
 
       - name: flake8 — style & syntax check
-        run: |
-          flake8 crtsh_recon/ main.py \
-            --max-line-length=100 \
-            --extend-ignore=E203,W503
+        run: flake8 crtsh_recon/ main.py --max-line-length=100 --extend-ignore=E203,W503
 
       - name: black — formatting check
-        run: |
-          black --check --diff --line-length=100 crtsh_recon/ main.py
+        run: black --check --diff --line-length=100 crtsh_recon/ main.py
