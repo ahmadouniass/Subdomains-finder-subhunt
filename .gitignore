@@ -27,6 +27,7 @@ pip-log.txt
 
 # ─── Testing & coverage ───────────────────────────────────
 .pytest_cache/
+.ruff_cache/
 .cache/
 htmlcov/
 .coverage
