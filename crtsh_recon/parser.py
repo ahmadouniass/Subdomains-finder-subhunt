@@ -10,12 +10,7 @@ logger = logging.getLogger(__name__)
 
 # Matches a valid (sub)domain label: letters, digits, hyphens.
 # Full domain: one or more labels separated by dots.
-_DOMAIN_RE = re.compile(
-    r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
-)
-
-# Wildcard prefix produced by crt.sh (e.g. "%.example.com")
-_WILDCARD_PREFIX = re.compile(r"^\%\.")
+_DOMAIN_RE = re.compile(r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$")
 
 
 def _split_name_value(raw: str) -> Iterator[str]:
@@ -28,8 +23,10 @@ def _split_name_value(raw: str) -> Iterator[str]:
 
 
 def _strip_wildcard(name: str) -> str:
-    """Remove leading ``*.`` wildcard prefix."""
-    return _WILDCARD_PREFIX.sub("", name)
+    """Remove leading wildcard prefix (``*.`` or ``%.``)."""
+    if name.startswith("*.") or name.startswith("%."):
+        return name[2:]
+    return name
 
 
 def _is_valid_subdomain(name: str, apex: str) -> bool:
@@ -75,9 +72,7 @@ def extract_subdomains(records: list[dict], domain: str) -> list[str]:
                     seen.add(cleaned)
                 else:
                     if cleaned:
-                        logger.debug(
-                            "Discarding invalid/out-of-scope name: %r", cleaned
-                        )
+                        logger.debug("Discarding invalid/out-of-scope name: %r", cleaned)
 
     subdomains = sorted(seen)
     logger.info(

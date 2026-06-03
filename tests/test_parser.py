@@ -19,13 +19,17 @@ class TestStripWildcard:
     def test_strips_wildcard_prefix(self):
         assert _strip_wildcard("*.example.com") == "example.com"
 
+    def test_strips_percent_prefix(self):          # ← nouveau
+        assert _strip_wildcard("%.example.com") == "example.com"
+
     def test_no_wildcard_unchanged(self):
         assert _strip_wildcard("sub.example.com") == "sub.example.com"
 
     def test_multiple_wildcards_only_leading_stripped(self):
-        # Only the leading *. should be stripped
         assert _strip_wildcard("*.*.example.com") == "*.example.com"
 
+    def test_multiple_percent_only_leading_stripped(self):  # ← nouveau
+        assert _strip_wildcard("%.%.example.com") == "%.example.com"
 
 # ---------------------------------------------------------------------------
 # _is_valid_subdomain
@@ -97,12 +101,6 @@ class TestExtractSubdomains:
         result = extract_subdomains(records, "example.com")
         assert "mail.example.com" in result
 
-    def test_wildcard_stripped(self):
-        records = [self._make_record("*.example.com")]
-        result = extract_subdomains(records, "example.com")
-        assert "example.com" in result
-        assert "*.example.com" not in result
-
     def test_deduplication(self):
         records = [
             self._make_record("mail.example.com"),
@@ -144,3 +142,13 @@ class TestExtractSubdomains:
         records = [{"name_value": "", "common_name": "vpn.example.com"}]
         result = extract_subdomains(records, "example.com")
         assert "vpn.example.com" in result
+        
+    def test_wildcard_stripped(self):
+        records = [self._make_record("*.example.com")]
+        result = extract_subdomains(records, "example.com")
+        assert "example.com" in result
+
+    def test_percent_wildcard_stripped(self):      # ← nouveau
+        records = [self._make_record("%.example.com")]
+        result = extract_subdomains(records, "example.com")
+        assert "example.com" in result

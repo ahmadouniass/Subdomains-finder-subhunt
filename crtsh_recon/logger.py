@@ -54,11 +54,9 @@ def setup_logging(
                 encoding="utf-8",
             )
             file_handler.setLevel(logging.DEBUG)
-            file_handler.setFormatter(
-                logging.Formatter(_FILE_FORMAT, datefmt=_DATE_FORMAT)
-            )
+            file_handler.setFormatter(logging.Formatter(_FILE_FORMAT, datefmt=_DATE_FORMAT))
             root.addHandler(file_handler)
-        except OSError as exc:
+        except (OSError, ValueError) as exc:
             root.warning("Could not create log file in %r: %s", log_dir, exc)
 
 

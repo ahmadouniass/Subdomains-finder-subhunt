@@ -31,8 +31,8 @@ It is designed for **bug bounty hunters**, **penetration testers**, and **securi
 ### From source (recommended for development)
 
 ```bash
-git clone https://github.com/yourhandle/crtsh-recon.git
-cd crtsh-recon
+git clone https://github.com/ahmadouniass/Subdomains-finder-crtsh.git
+cd Subdomains-finder-crtsh
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -259,6 +259,6 @@ Pull requests are welcome!
 
 ---
 
-## License
+## Disclaimer
 
-MIT © yourhandle — see [LICENSE](LICENSE) for full text.
+The crt.sh website is often down, so errors may occur frequently. We are also exploring the possibility of adding other sources, so feel free to suggest some to us.

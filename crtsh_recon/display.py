@@ -80,11 +80,7 @@ def print_banner(version: str = "1.0.0") -> None:
         print(cyan(BANNER))
     except UnicodeEncodeError:
         print(cyan(_SHORT_BANNER))
-    print(
-        dim(
-            f"  v{version}  |  Certificate Transparency Subdomain Recon  |  github.com/yourhandle/crtsh-recon"
-        )
-    )
+    print(dim(f"  v{version}   CRT SH |  https://github.com/ahmadouniass/Subdomains-finder-crtsh"))
     print()
 
 

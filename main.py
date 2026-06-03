@@ -35,7 +35,6 @@ from crtsh_recon.display import (
 )
 from crtsh_recon.exceptions import ValidationError
 
-
 # ---------------------------------------------------------------------------
 # Argument parser
 # ---------------------------------------------------------------------------
@@ -218,9 +217,7 @@ def main() -> int:
     )
 
     if result.subdomains:
-        print_success(
-            f"Done. {len(result.subdomains)} unique subdomain(s) found for {domain}."
-        )
+        print_success(f"Done. {len(result.subdomains)} unique subdomain(s) found for {domain}.")
     else:
         print_error(f"No subdomains discovered for {domain}.")
 
