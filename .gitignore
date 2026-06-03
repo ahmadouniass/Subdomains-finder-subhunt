@@ -35,6 +35,10 @@ htmlcov/
 coverage.xml
 *.cover
 nosetests.xml
+tests/__pycache__/
+crtsh_recon/__pycache__/
+crtsh_recon/.ruff_cache/
+
 
 # ─── IDE / éditeurs ───────────────────────────────────────
 .idea/
