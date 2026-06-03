@@ -38,7 +38,9 @@ def client():
 class TestFetchCertificates:
     def test_success_returns_list(self, client):
         records = [{"name_value": "mail.example.com", "common_name": "example.com"}]
-        with patch.object(client.session, "get", return_value=_mock_response(200, records)):
+        with patch.object(
+            client.session, "get", return_value=_mock_response(200, records)
+        ):
             result = client.fetch_certificates("example.com")
         assert result == records
 
@@ -71,7 +73,9 @@ class TestFetchCertificates:
 
     def test_connection_error_raises_client_error(self, client):
         with patch.object(
-            client.session, "get", side_effect=requests.exceptions.ConnectionError("fail")
+            client.session,
+            "get",
+            side_effect=requests.exceptions.ConnectionError("fail"),
         ):
             with pytest.raises(CRTClientError, match="Connection failed"):
                 client.fetch_certificates("example.com")

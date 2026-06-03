@@ -75,7 +75,9 @@ def extract_subdomains(records: list[dict], domain: str) -> list[str]:
                     seen.add(cleaned)
                 else:
                     if cleaned:
-                        logger.debug("Discarding invalid/out-of-scope name: %r", cleaned)
+                        logger.debug(
+                            "Discarding invalid/out-of-scope name: %r", cleaned
+                        )
 
     subdomains = sorted(seen)
     logger.info(

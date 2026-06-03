@@ -14,6 +14,7 @@ from crtsh_recon.parser import (
 # _strip_wildcard
 # ---------------------------------------------------------------------------
 
+
 class TestStripWildcard:
     def test_strips_wildcard_prefix(self):
         assert _strip_wildcard("*.example.com") == "example.com"
@@ -29,6 +30,7 @@ class TestStripWildcard:
 # ---------------------------------------------------------------------------
 # _is_valid_subdomain
 # ---------------------------------------------------------------------------
+
 
 class TestIsValidSubdomain:
     def test_valid_subdomain(self):
@@ -61,6 +63,7 @@ class TestIsValidSubdomain:
 # _split_name_value
 # ---------------------------------------------------------------------------
 
+
 class TestSplitNameValue:
     def test_newline_separated(self):
         result = list(_split_name_value("a.example.com\nb.example.com"))
@@ -83,6 +86,7 @@ class TestSplitNameValue:
 # ---------------------------------------------------------------------------
 # extract_subdomains
 # ---------------------------------------------------------------------------
+
 
 class TestExtractSubdomains:
     def _make_record(self, name_value: str, common_name: str = "") -> dict:

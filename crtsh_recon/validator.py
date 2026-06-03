@@ -43,7 +43,7 @@ def validate_domain(domain: str) -> str:
     # Strip scheme if the user accidentally passes a URL
     for scheme in ("https://", "http://"):
         if normalised.startswith(scheme):
-            normalised = normalised[len(scheme):]
+            normalised = normalised[len(scheme) :]
             logger.debug("Stripped URL scheme from domain: %r → %r", domain, normalised)
 
     # Strip any path component

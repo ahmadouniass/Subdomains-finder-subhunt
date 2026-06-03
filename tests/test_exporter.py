@@ -22,6 +22,7 @@ def out_dir(tmp_path) -> str:
 # TXT
 # ---------------------------------------------------------------------------
 
+
 class TestExportTxt:
     def test_creates_file(self, out_dir):
         path = export_txt(SUBDOMAINS, DOMAIN, out_dir)
@@ -44,6 +45,7 @@ class TestExportTxt:
 # ---------------------------------------------------------------------------
 # JSON
 # ---------------------------------------------------------------------------
+
 
 class TestExportJson:
     def test_creates_file(self, out_dir):
@@ -77,6 +79,7 @@ class TestExportJson:
 # CSV
 # ---------------------------------------------------------------------------
 
+
 class TestExportCsv:
     def test_creates_file(self, out_dir):
         path = export_csv(SUBDOMAINS, DOMAIN, out_dir)
@@ -109,6 +112,7 @@ class TestExportCsv:
 # ---------------------------------------------------------------------------
 # Dispatcher
 # ---------------------------------------------------------------------------
+
 
 class TestExportResults:
     def test_all_formats_written(self, out_dir):

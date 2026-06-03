@@ -10,6 +10,7 @@ from typing import Optional
 
 try:
     from colorama import Fore, Style, init as colorama_init
+
     colorama_init(autoreset=True)
     _COLOR_AVAILABLE = True
 except ImportError:
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Colour helpers
 # ---------------------------------------------------------------------------
 
+
 def _c(text: str, color_code: str) -> str:
     """Wrap *text* in an ANSI color code if colorama is available."""
     if _COLOR_AVAILABLE:
@@ -31,19 +33,24 @@ def _c(text: str, color_code: str) -> str:
 def green(text: str) -> str:
     return _c(text, Fore.GREEN) if _COLOR_AVAILABLE else text
 
+
 def cyan(text: str) -> str:
     return _c(text, Fore.CYAN) if _COLOR_AVAILABLE else text
+
 
 def yellow(text: str) -> str:
     return _c(text, Fore.YELLOW) if _COLOR_AVAILABLE else text
 
+
 def red(text: str) -> str:
     return _c(text, Fore.RED) if _COLOR_AVAILABLE else text
+
 
 def bold(text: str) -> str:
     if _COLOR_AVAILABLE:
         return f"{Style.BRIGHT}{text}{Style.RESET_ALL}"
     return text
+
 
 def dim(text: str) -> str:
     if _COLOR_AVAILABLE:
@@ -73,7 +80,11 @@ def print_banner(version: str = "1.0.0") -> None:
         print(cyan(BANNER))
     except UnicodeEncodeError:
         print(cyan(_SHORT_BANNER))
-    print(dim(f"  v{version}  |  Certificate Transparency Subdomain Recon  |  github.com/yourhandle/crtsh-recon"))
+    print(
+        dim(
+            f"  v{version}  |  Certificate Transparency Subdomain Recon  |  github.com/yourhandle/crtsh-recon"
+        )
+    )
     print()
 
 
@@ -105,6 +116,7 @@ def print_error(message: str) -> None:
 # Subdomain result table
 # ---------------------------------------------------------------------------
 
+
 def print_results(subdomains: list[str], domain: str) -> None:
     """
     Render a clean, numbered list of discovered subdomains.
@@ -127,7 +139,7 @@ def print_results(subdomains: list[str], domain: str) -> None:
             subdomain_col = yellow(sub)
         else:
             prefix = sub[: len(sub) - len(domain) - 1]
-            apex   = sub[len(sub) - len(domain):]
+            apex = sub[len(sub) - len(domain) :]
             subdomain_col = green(prefix) + dim(f".{apex}")
         print(f"{index_col}  {subdomain_col}")
 
@@ -161,7 +173,7 @@ def print_summary(
         print()
         print_info("Exported files:")
         for fmt, path in exported.items():
-            print(f"       {dim(fmt.upper()+':')}  {cyan(str(path))}")
+            print(f"       {dim(fmt.upper() + ':')}  {cyan(str(path))}")
 
     print()
 
@@ -169,6 +181,7 @@ def print_summary(
 # ---------------------------------------------------------------------------
 # Spinner / progress
 # ---------------------------------------------------------------------------
+
 
 class Spinner:
     """
@@ -193,6 +206,7 @@ class Spinner:
             print_info(self.message + " …")
             return self
         import threading
+
         self._stop_event = threading.Event()
         self._thread = threading.Thread(target=self._spin, daemon=True)
         self._thread.start()
@@ -211,6 +225,7 @@ class Spinner:
 
     def _spin(self) -> None:
         import time
+
         frame_idx = 0
         while not self._stop_event.is_set():
             frame = self._FRAMES[frame_idx % len(self._FRAMES)]

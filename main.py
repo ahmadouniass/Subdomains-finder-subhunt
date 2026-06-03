@@ -40,6 +40,7 @@ from crtsh_recon.exceptions import ValidationError
 # Argument parser
 # ---------------------------------------------------------------------------
 
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="crtsh-recon",
@@ -60,7 +61,8 @@ examples:
     # ── Target ──────────────────────────────────────────────────────────────
     target = parser.add_argument_group("target")
     target.add_argument(
-        "-d", "--domain",
+        "-d",
+        "--domain",
         required=True,
         metavar="DOMAIN",
         help="Apex domain to enumerate (e.g. example.com)",
@@ -69,7 +71,8 @@ examples:
     # ── Output ──────────────────────────────────────────────────────────────
     output = parser.add_argument_group("output")
     output.add_argument(
-        "-f", "--formats",
+        "-f",
+        "--formats",
         nargs="+",
         default=["txt"],
         metavar="FORMAT",
@@ -77,7 +80,8 @@ examples:
         help=f"Export format(s). Choices: {', '.join(sorted(VALID_FORMATS))}. Default: txt",
     )
     output.add_argument(
-        "-o", "--output-dir",
+        "-o",
+        "--output-dir",
         default="output",
         metavar="DIR",
         help="Directory for exported result files (default: ./output)",
@@ -115,7 +119,8 @@ examples:
     # ── Logging ─────────────────────────────────────────────────────────────
     logging_group = parser.add_argument_group("logging")
     logging_group.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Enable DEBUG-level console output",
     )
@@ -149,6 +154,7 @@ examples:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     """
