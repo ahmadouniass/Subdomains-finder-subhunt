@@ -340,3 +340,188 @@
 2026-06-01 18:43:13  INFO      crtsh_recon.parser:81  Extracted 9 unique subdomain(s) from 255 certificate record(s)
 2026-06-01 18:43:13  INFO      crtsh_recon.exporter:71  TXT exported → output\seneweb.com_20260601_184313.txt (9 entries)
 2026-06-01 18:43:13  DEBUG     crtsh_recon.scanner:101  Scan completed in 9.16s
+2026-06-03 11:35:42  DEBUG     crtsh_recon.scanner:71  Starting scan for seneweb.com
+2026-06-03 11:35:42  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.seneweb.com', 'output': 'json'}
+2026-06-03 11:35:46  DEBUG     crtsh_recon.client:100  Response: HTTP 404  (4.13s)  253 bytes
+2026-06-03 11:35:46  ERROR     crtsh_recon.scanner:94  Scan failed: No records found for domain: seneweb.com
+2026-06-03 11:35:46  DEBUG     crtsh_recon.scanner:101  Scan completed in 4.14s
+2026-06-03 11:35:54  DEBUG     crtsh_recon.scanner:71  Starting scan for seneweb.sn
+2026-06-03 11:35:54  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.seneweb.sn', 'output': 'json'}
+2026-06-03 11:35:56  DEBUG     crtsh_recon.client:100  Response: HTTP 404  (1.54s)  253 bytes
+2026-06-03 11:35:56  ERROR     crtsh_recon.scanner:94  Scan failed: No records found for domain: seneweb.sn
+2026-06-03 11:35:56  DEBUG     crtsh_recon.scanner:101  Scan completed in 1.55s
+2026-06-03 11:36:05  DEBUG     crtsh_recon.scanner:71  Starting scan for education.sn
+2026-06-03 11:36:05  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.education.sn', 'output': 'json'}
+2026-06-03 11:36:06  DEBUG     crtsh_recon.client:100  Response: HTTP 404  (1.21s)  253 bytes
+2026-06-03 11:36:06  ERROR     crtsh_recon.scanner:94  Scan failed: No records found for domain: education.sn
+2026-06-03 11:36:06  DEBUG     crtsh_recon.scanner:101  Scan completed in 1.22s
+2026-06-03 11:36:32  DEBUG     crtsh_recon.scanner:71  Starting scan for example.com
+2026-06-03 11:36:32  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.example.com', 'output': 'json'}
+2026-06-03 11:37:16  ERROR     crtsh_recon.scanner:94  Scan failed: Connection failed: HTTPSConnectionPool(host='crt.sh', port=443): Max retries exceeded with url: /?q=%25.example.com&output=json (Caused by ReadTimeoutError("HTTPSConnectionPool(host='crt.sh', port=443): Read timed out. (read timeout=30)"))
+2026-06-03 11:37:16  DEBUG     crtsh_recon.scanner:101  Scan completed in 43.58s
+2026-06-03 11:38:57  DEBUG     crtsh_recon.scanner:71  Starting scan for example.com
+2026-06-03 11:38:57  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.example.com', 'output': 'json'}
+2026-06-03 11:38:59  DEBUG     crtsh_recon.client:100  Response: HTTP 404  (1.64s)  253 bytes
+2026-06-03 11:38:59  ERROR     crtsh_recon.scanner:94  Scan failed: No records found for domain: example.com
+2026-06-03 11:38:59  DEBUG     crtsh_recon.scanner:101  Scan completed in 1.64s
+2026-06-03 11:40:51  DEBUG     crtsh_recon.scanner:71  Starting scan for education.sn
+2026-06-03 11:40:51  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.education.sn', 'output': 'json'}
+2026-06-03 11:42:05  ERROR     crtsh_recon.scanner:94  Scan failed: Connection failed: HTTPSConnectionPool(host='crt.sh', port=443): Max retries exceeded with url: /?q=%25.education.sn&output=json (Caused by ReadTimeoutError("HTTPSConnectionPool(host='crt.sh', port=443): Read timed out. (read timeout=30)"))
+2026-06-03 11:42:05  DEBUG     crtsh_recon.scanner:101  Scan completed in 74.58s
+2026-06-03 11:42:57  DEBUG     crtsh_recon.scanner:71  Starting scan for education.sn
+2026-06-03 11:42:57  DEBUG     crtsh_recon.client:85  GET https://crt.sh params={'q': '%.education.sn', 'output': 'json'}
+2026-06-03 11:43:26  DEBUG     crtsh_recon.client:100  Response: HTTP 200  (28.07s)  367125 bytes
+2026-06-03 11:43:26  DEBUG     crtsh_recon.client:129  Received 1055 certificate records
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.planete3.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.planete3.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.planete3.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.planete3.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.planete-1.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.planete-1.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: 'mensg.edu.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  DEBUG     crtsh_recon.parser:78  Discarding invalid/out-of-scope name: '*.education.sn'
+2026-06-03 11:43:26  INFO      crtsh_recon.parser:81  Extracted 81 unique subdomain(s) from 1055 certificate record(s)
+2026-06-03 11:43:26  INFO      crtsh_recon.exporter:71  TXT exported → output\education.sn_20260603_114326.txt (81 entries)
+2026-06-03 11:43:26  DEBUG     crtsh_recon.scanner:101  Scan completed in 28.18s

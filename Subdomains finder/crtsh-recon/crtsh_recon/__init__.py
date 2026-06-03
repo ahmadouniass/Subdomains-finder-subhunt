@@ -11,7 +11,7 @@ Usage (library)::
 """
 
 __version__ = "1.0.0"
-__author__ = "yourhandle"
+__author__ = "Ahmadou Niass"
 __license__ = "MIT"
 
 from .scanner import run_scan, ScanConfig, ScanResult  # noqa: F401
