@@ -28,6 +28,7 @@ class ScanResult:
     exported_files: dict[str, Path] = field(default_factory=dict)
     elapsed: float = 0.0
     error: Optional[str] = None
+    crtsh_available: bool = True
 
     @property
     def success(self) -> bool:
@@ -52,10 +53,11 @@ def run_scan(config: ScanConfig) -> ScanResult:
     Execute a full subdomain enumeration scan for *config.domain*.
 
     Steps:
-    1. Fetch raw certificate records via :class:`CRTClient`.
-    2. Optionally fetch from HackerTarget API and merge results.
-    3. Parse & deduplicate subdomains with :func:`extract_subdomains`.
-    4. Export results in the requested formats.
+    1. Health check CRT.sh availability (quick 5s ping).
+    2. Fetch raw certificate records via :class:`CRTClient` (if available).
+    3. Optionally fetch from HackerTarget API and merge results.
+    4. Parse & deduplicate subdomains with :func:`extract_subdomains`.
+    5. Export results in the requested formats.
 
     Args:
         config: A populated :class:`ScanConfig` instance.
@@ -68,26 +70,39 @@ def run_scan(config: ScanConfig) -> ScanResult:
 
     all_subdomains = set()
 
-    # ─── Fetch from CRT.sh ───────────────────────────────────────────────────
+    # ─── Health check CRT.sh ─────────────────────────────────────────────────
     with CRTClient(
         timeout=config.timeout,
         retries=config.retries,
         backoff=config.backoff,
     ) as client:
-        try:
-            logger.debug("Starting scan for %s via CRT.sh", config.domain)
-            records = client.fetch_certificates(config.domain)
-            result.cert_count = len(records)
+        crtsh_is_healthy = client.health_check(timeout=5)
+        result.crtsh_available = crtsh_is_healthy
 
-            subdomains = extract_subdomains(records, config.domain)
-            all_subdomains.update(subdomains)
-            logger.info("CRT.sh: Found %d subdomain(s)", len(subdomains))
+        if not crtsh_is_healthy:
+            logger.warning("CRT.sh appears to be down or unreachable")
 
-        except CRTReconError as exc:
-            logger.warning("CRT.sh scan failed: %s", exc)
-            # Don't fail immediately; try HackerTarget if enabled
-        except Exception as exc:  # pragma: no cover
-            logger.warning("Unexpected error during CRT.sh scan: %s", exc)
+    # ─── Fetch from CRT.sh (only if healthy) ────────────────────────────────
+    if result.crtsh_available:
+        with CRTClient(
+            timeout=config.timeout,
+            retries=config.retries,
+            backoff=config.backoff,
+        ) as client:
+            try:
+                logger.debug("Starting scan for %s via CRT.sh", config.domain)
+                records = client.fetch_certificates(config.domain)
+                result.cert_count = len(records)
+
+                subdomains = extract_subdomains(records, config.domain)
+                all_subdomains.update(subdomains)
+                logger.info("CRT.sh: Found %d subdomain(s)", len(subdomains))
+
+            except CRTReconError as exc:
+                logger.warning("CRT.sh scan failed: %s", exc)
+                # Don't fail immediately; try HackerTarget if enabled
+            except Exception as exc:  # pragma: no cover
+                logger.warning("Unexpected error during CRT.sh scan: %s", exc)
 
     # ─── Fetch from HackerTarget (if enabled) ────────────────────────────────
     if config.use_hackertarget:
@@ -110,10 +125,13 @@ def run_scan(config: ScanConfig) -> ScanResult:
 
     # ─── Validate we have results ────────────────────────────────────────────
     if not all_subdomains:
-        result.error = (
+        error_msg = (
             f"No subdomains found for {config.domain} from any source. "
             "Ensure the domain is valid and has public certificates."
         )
+        if not result.crtsh_available:
+            error_msg += " (CRT.sh was unavailable during this scan)"
+        result.error = error_msg
         result.elapsed = time.monotonic() - start
         return result
 
@@ -126,7 +144,10 @@ def run_scan(config: ScanConfig) -> ScanResult:
             "cert_records_fetched": result.cert_count,
             "hackertarget_results": result.hackertarget_count,
             "retries_configured": config.retries,
-            "sources": ["crt.sh"] + (["hackertarget"] if config.use_hackertarget else []),
+            "sources": (["crt.sh"] if result.crtsh_available else []) + (
+                ["hackertarget"] if config.use_hackertarget else []
+            ),
+            "crtsh_available": result.crtsh_available,
         }
         try:
             result.exported_files = export_results(
