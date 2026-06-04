@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- Multi-source subdomain enumeration: CRT.sh + HackerTarget API integration
+- `--disable-hackertarget` flag to use CRT.sh exclusively
+- `HackerTargetClient` for robust HackerTarget API querying with retry logic
+- `HackerTargetClientError` exception type for HackerTarget-specific errors
+- Enhanced scanner to merge results from multiple sources and deduplicate
+- Comprehensive test suite for HackerTarget client (`test_hackertarget.py`)
+
+### Changed
+- `ScanResult` now includes `hackertarget_count` field to track results per source
+- `ScanConfig` now includes `use_hackertarget` boolean flag (default: True)
+- JSON export metadata now includes `hackertarget_results` and `sources` list
+
+---
+
 ## [1.0.0] - 2024-06-03
 
 ### Added
@@ -31,9 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## Unreleased
+## Planned
 
-### Planned
-- Multi-source mode: AlienVault OTX, HackerTarget, RapidDNS fallback when crt.sh is unavailable
-- DNS resolution of discovered subdomains
+### Future Features
 - PyPI release (`pip install crtsh-recon`)
+- Additional DNS sources (RapidDNS, AlienVault OTX)
+- DNS resolution of discovered subdomains
