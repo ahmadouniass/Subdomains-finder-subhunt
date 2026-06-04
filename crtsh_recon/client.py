@@ -63,6 +63,42 @@ class CRTClient:
         self.timeout = timeout
         self.session = _build_session(retries, backoff)
 
+    def health_check(self, timeout: int = 5) -> bool:
+        """
+        Quick health check for crt.sh availability.
+
+        Pings crt.sh with a short timeout to determine if the service is reachable.
+        This helps avoid false negatives (assuming no subdomains exist when crt.sh is down).
+
+        Args:
+            timeout: Health check timeout in seconds (default: 5).
+
+        Returns:
+            True if crt.sh is reachable and responding with 2xx/3xx status, False otherwise.
+        """
+        try:
+            response = self.session.get(
+                CRTSH_BASE_URL,
+                timeout=timeout,
+                allow_redirects=False,
+            )
+            is_healthy = response.status_code < 500
+            logger.debug(
+                "CRT.sh health check: HTTP %d — %s",
+                response.status_code,
+                "UP" if is_healthy else "DEGRADED",
+            )
+            return is_healthy
+        except requests.exceptions.Timeout:
+            logger.warning("CRT.sh health check timed out after %ds", timeout)
+            return False
+        except requests.exceptions.ConnectionError:
+            logger.warning("CRT.sh health check failed: connection refused")
+            return False
+        except Exception as exc:
+            logger.warning("CRT.sh health check failed: %s", exc)
+            return False
+
     def fetch_certificates(self, domain: str) -> list[dict]:
         """
         Fetch all certificate records for *domain* from crt.sh.
