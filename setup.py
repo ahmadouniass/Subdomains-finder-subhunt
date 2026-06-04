@@ -25,11 +25,11 @@ setup(
     description="Professional subdomain enumeration via crt.sh Certificate Transparency logs",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourhandle/crtsh-recon",
+    url="https://github.com/ahmadouniass/Subdomains-finder-crtsh",
     project_urls={
-        "Bug Tracker": "https://github.com/yourhandle/crtsh-recon/issues",
-        "Documentation": "https://github.com/yourhandle/crtsh-recon#readme",
-        "Source": "https://github.com/yourhandle/crtsh-recon",
+        "Bug Tracker": "https://github.com/ahmadouniass/Subdomains-finder-crtsh/issues",
+        "Documentation": "https://github.com/ahmadouniass/Subdomains-finder-crtsh#readme",
+        "Source": "https://github.com/ahmadouniass/Subdomains-finder-crtsh",
     },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
