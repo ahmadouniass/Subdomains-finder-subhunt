@@ -4,24 +4,42 @@ exceptions.py — Custom exception hierarchy for crtsh-recon.
 
 
 class CRTReconError(Exception):
-    """Base exception for all crtsh-recon errors."""
+    """Base exception for crtsh-recon."""
+
+    pass
 
 
 class CRTClientError(CRTReconError):
-    """Raised when the HTTP client encounters an unrecoverable error."""
+    """Raised when CRT.sh API client encounters an error."""
+
+    pass
 
 
 class CRTNotFoundError(CRTClientError):
-    """Raised when crt.sh returns no records for the given domain."""
+    """Raised when CRT.sh returns 404 (no records found)."""
+
+    pass
 
 
 class CRTRateLimitError(CRTClientError):
-    """Raised when crt.sh rate-limits the client."""
+    """Raised when CRT.sh returns 429 (rate limited)."""
+
+    pass
+
+
+class HackerTargetClientError(CRTReconError):
+    """Raised when HackerTarget API client encounters an error."""
+
+    pass
 
 
 class ValidationError(CRTReconError):
     """Raised when input validation fails."""
 
+    pass
+
 
 class ExportError(CRTReconError):
-    """Raised when writing results to disk fails."""
+    """Raised when result export fails."""
+
+    pass
