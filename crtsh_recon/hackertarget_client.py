@@ -5,7 +5,6 @@ hackertarget_client.py — HackerTarget API client for subdomain enumeration.
 import time
 import logging
 from typing import Set
-
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -87,7 +86,7 @@ class HackerTargetClient:
         except requests.exceptions.ConnectionError as exc:
             raise HackerTargetClientError(f"Connection failed: {exc}") from exc
         except requests.exceptions.Timeout as exc:
-            raise HackerTargetClientError(f"Request timed out after {self.timeout}s: {exc}") from exc
+            raise HackerTargetClientError(f"Request time out after {self.timeout}s: {exc}") from exc
         except requests.exceptions.RequestException as exc:
             raise HackerTargetClientError(f"Unexpected request error: {exc}") from exc
 
