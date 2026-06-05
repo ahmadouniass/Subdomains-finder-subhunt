@@ -43,6 +43,7 @@ def _build_session(retries: int, backoff: float) -> requests.Session:
     )
     return session
 
+
 def _parse_response(text: str) -> list[str]:
     """
     Parse plain-text HackerTarget response into a list of subdomain strings.
@@ -58,6 +59,7 @@ def _parse_response(text: str) -> list[str]:
         if subdomain:
             subdomains.append(subdomain)
     return subdomains
+
 
 class HackerTargetClient:
     """
