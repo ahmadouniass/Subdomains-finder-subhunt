@@ -144,9 +144,8 @@ def run_scan(config: ScanConfig) -> ScanResult:
             "cert_records_fetched": result.cert_count,
             "hackertarget_results": result.hackertarget_count,
             "retries_configured": config.retries,
-            "sources": (["crt.sh"] if result.crtsh_available else []) + (
-                ["hackertarget"] if config.use_hackertarget else []
-            ),
+            "sources": (["crt.sh"] if result.crtsh_available else [])
+            + (["hackertarget"] if config.use_hackertarget else []),
             "crtsh_available": result.crtsh_available,
         }
         try:
