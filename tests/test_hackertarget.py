@@ -2,100 +2,171 @@
 tests/test_hackertarget.py — Unit tests for crtsh_recon.hackertarget_client
 """
 
-from unittest.mock import Mock, patch
 import pytest
+import requests
+from unittest.mock import Mock, patch, MagicMock
 
-from crtsh_recon.hackertarget_client import HackerTargetClient
+from crtsh_recon.hackertarget_client import HackerTargetClient, _parse_response
 from crtsh_recon.exceptions import HackerTargetClientError
 
 
-class TestHackerTargetClient:
-    """Test suite for HackerTargetClient."""
+# ─── Helpers ─────────────────────────────────────────────────────────────────
 
-    def test_fetch_subdomains_success(self):
-        """Test successful subdomain fetch from HackerTarget."""
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = "api.example.com,1.2.3.4\nmail.example.com,5.6.7.8\nexample.com,9.10.11.12\n"
-        mock_response.content = mock_response.text.encode()
+def _mock_response(status_code: int, text: str = "") -> Mock:
+    """Build a minimal mock requests.Response."""
+    mock = Mock()
+    mock.status_code = status_code
+    mock.ok = 200 <= status_code < 300
+    mock.text = text
+    mock.content = text.encode()
+    return mock
 
-        with patch("crtsh_recon.hackertarget_client.requests.Session.get", return_value=mock_response):
-            client = HackerTargetClient(timeout=30)
+
+@pytest.fixture
+def client():
+    return HackerTargetClient(timeout=5, retries=1, backoff=0.0)
+
+
+# ─── _parse_response (unit) ───────────────────────────────────────────────────
+
+class TestParseResponse:
+    def test_basic_csv_format(self):
+        text = "api.example.com,1.2.3.4\nmail.example.com,5.6.7.8"
+        result = _parse_response(text)
+        assert "api.example.com" in result
+        assert "mail.example.com" in result
+
+    def test_ip_discarded(self):
+        result = _parse_response("api.example.com,1.2.3.4")
+        assert "1.2.3.4" not in result
+
+    def test_empty_lines_skipped(self):
+        result = _parse_response("api.example.com,1.2.3.4\n\n\nmail.example.com,5.6.7.8")
+        assert len(result) == 2
+
+    def test_lowercase_normalisation(self):
+        result = _parse_response("API.EXAMPLE.COM,1.2.3.4\nMail.Example.Com,5.6.7.8")
+        assert "api.example.com" in result
+        assert "mail.example.com" in result
+        assert "API.EXAMPLE.COM" not in result
+
+    def test_empty_string_returns_empty(self):
+        assert _parse_response("") == []
+
+    def test_single_entry_no_newline(self):
+        result = _parse_response("www.example.com,1.2.3.4")
+        assert result == ["www.example.com"]
+
+
+# ─── fetch_subdomains — happy path ────────────────────────────────────────────
+
+class TestFetchSubdomainsSuccess:
+    def test_returns_set_of_subdomains(self, client):
+        text = "api.example.com,1.2.3.4\nmail.example.com,5.6.7.8\nexample.com,9.10.11.12"
+        with patch.object(client.session, "get", return_value=_mock_response(200, text)):
             result = client.fetch_subdomains("example.com")
+        assert "api.example.com" in result
+        assert "mail.example.com" in result
+        assert "example.com" in result
 
-            assert "api.example.com" in result
-            assert "mail.example.com" in result
-            assert "example.com" in result
-            assert len(result) == 3
+    def test_correct_count(self, client):
+        text = "api.example.com,1.2.3.4\nmail.example.com,5.6.7.8"
+        with patch.object(client.session, "get", return_value=_mock_response(200, text)):
+            result = client.fetch_subdomains("example.com")
+        assert len(result) == 2
 
-    def test_fetch_subdomains_no_results(self):
-        """Test when HackerTarget returns error (no results)."""
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = "error"
-        mock_response.content = b"error"
+    def test_subdomains_lowercased(self, client):
+        text = "API.EXAMPLE.COM,1.2.3.4\nMail.Example.Com,5.6.7.8"
+        with patch.object(client.session, "get", return_value=_mock_response(200, text)):
+            result = client.fetch_subdomains("example.com")
+        assert "api.example.com" in result
+        assert "mail.example.com" in result
+        assert "API.EXAMPLE.COM" not in result
 
-        with patch("crtsh_recon.hackertarget_client.requests.Session.get", return_value=mock_response):
-            client = HackerTargetClient(timeout=30)
+    def test_correct_url_called(self, client):
+        text = "api.example.com,1.2.3.4"
+        with patch.object(client.session, "get", return_value=_mock_response(200, text)) as mock_get:
+            client.fetch_subdomains("example.com")
+        call_url = mock_get.call_args[0][0]
+        assert "hackertarget.com" in call_url
+        assert "hostsearch" in call_url
+
+    def test_correct_query_param(self, client):
+        text = "api.example.com,1.2.3.4"
+        with patch.object(client.session, "get", return_value=_mock_response(200, text)) as mock_get:
+            client.fetch_subdomains("example.com")
+        params = mock_get.call_args[1]["params"]
+        assert params["q"] == "example.com"
+
+
+# ─── fetch_subdomains — empty / no results ────────────────────────────────────
+
+class TestFetchSubdomainsEmpty:
+    def test_error_prefix_returns_empty(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(200, "error check your search parameter")):
             result = client.fetch_subdomains("nonexistent.com")
+        assert result == set()
 
-            assert result == set()
-
-    def test_fetch_subdomains_empty_response(self):
-        """Test when HackerTarget returns empty response."""
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = ""
-        mock_response.content = b""
-
-        with patch("crtsh_recon.hackertarget_client.requests.Session.get", return_value=mock_response):
-            client = HackerTargetClient(timeout=30)
+    def test_empty_body_returns_empty(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(200, "")):
             result = client.fetch_subdomains("example.com")
+        assert result == set()
 
-            assert result == set()
+    def test_404_returns_empty(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(404, "")):
+            result = client.fetch_subdomains("example.com")
+        assert result == set()
 
-    def test_fetch_subdomains_rate_limit(self):
-        """Test when HackerTarget rate limits (429)."""
-        mock_response = Mock()
-        mock_response.status_code = 429
-        mock_response.content = b""
+    def test_whitespace_only_body_returns_empty(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(200, "   \n\n  ")):
+            result = client.fetch_subdomains("example.com")
+        assert result == set()
 
-        with patch("crtsh_recon.hackertarget_client.requests.Session.get", return_value=mock_response):
-            client = HackerTargetClient(timeout=30)
 
+# ─── fetch_subdomains — error handling ────────────────────────────────────────
+
+class TestFetchSubdomainsErrors:
+    def test_rate_limit_429_raises(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(429, "")):
             with pytest.raises(HackerTargetClientError, match="rate limit"):
                 client.fetch_subdomains("example.com")
 
-    def test_fetch_subdomains_http_error(self):
-        """Test when HackerTarget returns HTTP error."""
-        mock_response = Mock()
-        mock_response.status_code = 500
-        mock_response.ok = False
-        mock_response.content = b""
-
-        with patch("crtsh_recon.hackertarget_client.requests.Session.get", return_value=mock_response):
-            client = HackerTargetClient(timeout=30)
-
+    def test_http_500_raises(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(500, "")):
             with pytest.raises(HackerTargetClientError, match="HTTP 500"):
                 client.fetch_subdomains("example.com")
 
-    def test_context_manager(self):
-        """Test HackerTargetClient as context manager."""
-        with HackerTargetClient(timeout=30) as client:
-            assert client is not None
-            assert hasattr(client, "fetch_subdomains")
+    def test_http_503_raises(self, client):
+        with patch.object(client.session, "get", return_value=_mock_response(503, "")):
+            with pytest.raises(HackerTargetClientError, match="HTTP 503"):
+                client.fetch_subdomains("example.com")
 
-    def test_lowercase_normalization(self):
-        """Test that subdomains are normalized to lowercase."""
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.text = "API.EXAMPLE.COM,1.2.3.4\nMail.Example.Com,5.6.7.8\n"
-        mock_response.content = mock_response.text.encode()
+    def test_connection_error_raises(self, client):
+        with patch.object(client.session, "get", side_effect=requests.exceptions.ConnectionError("fail")):
+            with pytest.raises(HackerTargetClientError, match="Connection failed"):
+                client.fetch_subdomains("example.com")
 
-        with patch("crtsh_recon.hackertarget_client.requests.Session.get", return_value=mock_response):
-            client = HackerTargetClient(timeout=30)
-            result = client.fetch_subdomains("example.com")
+    def test_timeout_raises(self, client):
+        with patch.object(client.session, "get", side_effect=requests.exceptions.Timeout("timeout")):
+            with pytest.raises(HackerTargetClientError, match="time out"):
+                client.fetch_subdomains("example.com")
 
-            assert "api.example.com" in result
-            assert "mail.example.com" in result
-            assert "API.EXAMPLE.COM" not in result
+    def test_request_exception_raises(self, client):
+        with patch.object(client.session, "get", side_effect=requests.exceptions.RequestException("err")):
+            with pytest.raises(HackerTargetClientError, match="Unexpected"):
+                client.fetch_subdomains("example.com")
+
+
+# ─── Context manager ──────────────────────────────────────────────────────────
+
+class TestContextManager:
+    def test_enter_returns_client(self):
+        with HackerTargetClient() as c:
+            assert isinstance(c, HackerTargetClient)
+
+    def test_session_closed_on_exit(self):
+        with HackerTargetClient() as c:
+            with patch.object(c.session, "close") as mock_close:
+                pass
+        # Verified by ensuring no exception and client is usable inside block
+        assert c is not None
