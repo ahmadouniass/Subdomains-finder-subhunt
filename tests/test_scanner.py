@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 
 from crtsh_recon.scanner import run_scan, ScanConfig, ScanResult
-from crtsh_recon.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitError, HackerTargetClientError
+from crtsh_recon.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitError, HackerTargetClientError, CRTReconError
 
 
 # ─── Fixtures & helpers ───────────────────────────────────────────────────────
@@ -315,7 +315,7 @@ class TestRunScanErrors:
         for sub in CRTSH_SUBS:
             assert sub in result.subdomains
 
-    @patch("crtsh_recon.scanner.export_results", side_effect=Exception("disk full"))
+    @patch("crtsh_recon.scanner.export_results", side_effect=CRTReconError("disk full"))
     @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
     @patch("crtsh_recon.scanner.HackerTargetClient")
     @patch("crtsh_recon.scanner.CRTClient")
