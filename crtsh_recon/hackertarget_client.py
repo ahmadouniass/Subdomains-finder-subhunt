@@ -5,6 +5,7 @@ hackertarget_client.py — HackerTarget API client for subdomain enumeration.
 import time
 import logging
 from typing import Set
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -42,6 +43,21 @@ def _build_session(retries: int, backoff: float) -> requests.Session:
     )
     return session
 
+def _parse_response(text: str) -> list[str]:
+    """
+    Parse plain-text HackerTarget response into a list of subdomain strings.
+    Each line has the format ``subdomain.example.com,1.2.3.4``.
+    """
+    subdomains: list[str] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(",", 1)
+        subdomain = parts[0].strip().lower()
+        if subdomain:
+            subdomains.append(subdomain)
+    return subdomains
 
 class HackerTargetClient:
     """
@@ -117,18 +133,7 @@ class HackerTargetClient:
             logger.info("HackerTarget returned error for %s: %s", domain, text)
             return set()
 
-        subdomains = set()
-        for line in text.split("\n"):
-            if not line.strip():
-                continue
-            # Format: subdomain.com,1.2.3.4
-            parts = line.split(",")
-            if parts:
-                subdomain = parts[0].strip().lower()
-                if subdomain:
-                    subdomains.add(subdomain)
-                    logger.debug("Extracted subdomain from HackerTarget: %s", subdomain)
-
+        subdomains = set(_parse_response(text))
         logger.info("Fetched %d subdomain(s) from HackerTarget for %s", len(subdomains), domain)
         return subdomains
 

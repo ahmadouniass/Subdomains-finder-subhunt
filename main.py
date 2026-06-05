@@ -213,8 +213,7 @@ def main() -> int:
     print_info(f"Output directory: {args.output_dir}")
     print_info(f"Timeout / Retries: {args.timeout}s / {args.retries}")
     print_info(
-        f"Sources         : CRT.sh"
-        + (" + HackerTarget" if not args.disable_hackertarget else "")
+        "Sources         : CRT.sh" + (" + HackerTarget" if not args.disable_hackertarget else "")
     )
 
     with Spinner(f"Querying sources for *.{domain}"):
