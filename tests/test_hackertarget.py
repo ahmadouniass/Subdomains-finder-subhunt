@@ -6,8 +6,8 @@ import pytest
 import requests
 from unittest.mock import Mock, patch, MagicMock
 
-from crtsh_recon.hackertarget_client import HackerTargetClient, _parse_response
-from crtsh_recon.exceptions import HackerTargetClientError
+from subhunt.hackertarget_client import HackerTargetClient, _parse_response
+from subhunt.exceptions import HackerTargetClientError
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────

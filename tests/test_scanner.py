@@ -9,8 +9,8 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 
-from crtsh_recon.scanner import run_scan, ScanConfig, ScanResult
-from crtsh_recon.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitError, HackerTargetClientError, CRTReconError
+from subhunt.scanner import run_scan, ScanConfig, ScanResult
+from subhunt.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitError, HackerTargetClientError, CRTReconError
 
 
 # ─── Fixtures & helpers ───────────────────────────────────────────────────────
@@ -103,10 +103,10 @@ class TestScanResult:
 # ─── Happy path — both sources ────────────────────────────────────────────────
 
 class TestRunScanBothSources:
-    @patch("crtsh_recon.scanner.export_results", return_value={"txt": Path("/tmp/out.txt")})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={"txt": Path("/tmp/out.txt")})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_success_returns_scan_result(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.side_effect = [_mock_crt_client().return_value, _mock_crt_client().return_value]
         MockCRT.return_value = _mock_crt_client().return_value
@@ -116,10 +116,10 @@ class TestRunScanBothSources:
         assert isinstance(result, ScanResult)
         assert result.success is True
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_subdomains_merged_from_both_sources(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client().return_value
@@ -130,10 +130,10 @@ class TestRunScanBothSources:
         for sub in HT_SUBS:
             assert sub in result.subdomains
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_subdomains_deduplicated(self, MockCRT, MockHT, mock_extract, mock_export):
         # Both sources return same subdomain
         MockCRT.return_value = _mock_crt_client().return_value
@@ -142,10 +142,10 @@ class TestRunScanBothSources:
         result = run_scan(_make_config())
         assert result.subdomains.count("api.example.com") == 1
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_subdomains_sorted(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client().return_value
@@ -153,10 +153,10 @@ class TestRunScanBothSources:
         result = run_scan(_make_config())
         assert result.subdomains == sorted(result.subdomains)
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_cert_count_set(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client(records=FAKE_RECORDS).return_value
         MockHT.return_value = _mock_ht_client().return_value
@@ -164,10 +164,10 @@ class TestRunScanBothSources:
         result = run_scan(_make_config())
         assert result.cert_count == len(FAKE_RECORDS)
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_hackertarget_count_set(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client(subdomains=HT_SUBS).return_value
@@ -175,10 +175,10 @@ class TestRunScanBothSources:
         result = run_scan(_make_config())
         assert result.hackertarget_count == len(HT_SUBS)
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_elapsed_set(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client().return_value
@@ -186,10 +186,10 @@ class TestRunScanBothSources:
         result = run_scan(_make_config())
         assert result.elapsed >= 0.0
 
-    @patch("crtsh_recon.scanner.export_results", return_value={"txt": Path("/tmp/out.txt")})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={"txt": Path("/tmp/out.txt")})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_exported_files_populated(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client().return_value
@@ -201,10 +201,10 @@ class TestRunScanBothSources:
 # ─── crtsh_available flag ─────────────────────────────────────────────────────
 
 class TestCrtshAvailability:
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=[])
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=[])
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_crtsh_available_true_when_healthy(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client(healthy=True).return_value
         MockHT.return_value = _mock_ht_client(subdomains=HT_SUBS).return_value
@@ -212,9 +212,9 @@ class TestCrtshAvailability:
         result = run_scan(_make_config())
         assert result.crtsh_available is True
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_crtsh_available_false_when_unhealthy(self, MockCRT, MockHT, mock_export):
         MockCRT.return_value = _mock_crt_client(healthy=False).return_value
         MockHT.return_value = _mock_ht_client(subdomains=HT_SUBS).return_value
@@ -222,9 +222,9 @@ class TestCrtshAvailability:
         result = run_scan(_make_config())
         assert result.crtsh_available is False
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_crtsh_down_uses_hackertarget_as_fallback(self, MockCRT, MockHT, mock_export):
         MockCRT.return_value = _mock_crt_client(healthy=False).return_value
         MockHT.return_value = _mock_ht_client(subdomains=HT_SUBS).return_value
@@ -234,9 +234,9 @@ class TestCrtshAvailability:
         for sub in HT_SUBS:
             assert sub in result.subdomains
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_crtsh_down_error_mentions_unavailability(self, MockCRT, MockHT, mock_export):
         MockCRT.return_value = _mock_crt_client(healthy=False).return_value
         MockHT.return_value = _mock_ht_client(subdomains=set()).return_value
@@ -249,20 +249,20 @@ class TestCrtshAvailability:
 # ─── HackerTarget disabled ────────────────────────────────────────────────────
 
 class TestHackerTargetDisabled:
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_hackertarget_not_called_when_disabled(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
 
         run_scan(_make_config(use_hackertarget=False))
         MockHT.assert_not_called()
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_crtsh_only_results_when_ht_disabled(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
 
@@ -274,21 +274,21 @@ class TestHackerTargetDisabled:
 # ─── Error handling ───────────────────────────────────────────────────────────
 
 class TestRunScanErrors:
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_no_results_from_any_source_sets_error(self, MockCRT, MockHT):
         MockCRT.return_value = _mock_crt_client(records=[]).return_value
         MockHT.return_value = _mock_ht_client(subdomains=set()).return_value
 
-        with patch("crtsh_recon.scanner.extract_subdomains", return_value=[]):
+        with patch("subhunt.scanner.extract_subdomains", return_value=[]):
             result = run_scan(_make_config())
 
         assert result.success is False
         assert result.error is not None
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_crtsh_error_continues_to_hackertarget(self, MockCRT, MockHT, mock_export):
         MockCRT.return_value = _mock_crt_client(
             side_effect=CRTClientError("502 bad gateway")
@@ -300,10 +300,10 @@ class TestRunScanErrors:
         for sub in HT_SUBS:
             assert sub in result.subdomains
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_hackertarget_error_does_not_fail_scan(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client(
@@ -315,10 +315,10 @@ class TestRunScanErrors:
         for sub in CRTSH_SUBS:
             assert sub in result.subdomains
 
-    @patch("crtsh_recon.scanner.export_results", side_effect=CRTReconError("disk full"))
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", side_effect=CRTReconError("disk full"))
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_export_error_captured(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client().return_value
@@ -326,10 +326,10 @@ class TestRunScanErrors:
         result = run_scan(_make_config())
         assert result.success is False
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_elapsed_set_even_on_error(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client(
             side_effect=CRTClientError("fail")
@@ -339,10 +339,10 @@ class TestRunScanErrors:
         result = run_scan(_make_config())
         assert result.elapsed >= 0.0
 
-    @patch("crtsh_recon.scanner.export_results", return_value={})
-    @patch("crtsh_recon.scanner.extract_subdomains", return_value=CRTSH_SUBS)
-    @patch("crtsh_recon.scanner.HackerTargetClient")
-    @patch("crtsh_recon.scanner.CRTClient")
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
     def test_formats_empty_skips_export(self, MockCRT, MockHT, mock_extract, mock_export):
         MockCRT.return_value = _mock_crt_client().return_value
         MockHT.return_value = _mock_ht_client().return_value

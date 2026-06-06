@@ -8,7 +8,7 @@ import pytest
 from io import StringIO
 from unittest.mock import patch, MagicMock
 
-from crtsh_recon.display import (
+from subhunt.display import (
     green, cyan, yellow, red, bold, dim,
     print_banner,
     print_section,

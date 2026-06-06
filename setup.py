@@ -1,5 +1,5 @@
 """
-setup.py — Package configuration for crtsh-recon.
+setup.py — Package configuration for subhunt.
 
 Install for development:
     pip install -e .
@@ -8,7 +8,7 @@ Install from source:
     pip install .
 
 After installation the CLI is available as:
-    crtsh-recon --help
+    subhunt --help
 """
 
 from setuptools import setup, find_packages
@@ -18,18 +18,18 @@ HERE = Path(__file__).parent
 LONG_DESCRIPTION = (HERE / "README.md").read_text(encoding="utf-8")
 
 setup(
-    name="crtsh-recon",
-    version="1.0.0",
+    name="subhunt",
+    version="1.2.0",
     author="ahmed_tripping",
     author_email="ahmadouniass2@gmail.com",
     description="Professional subdomain enumeration via crt.sh Certificate Transparency logs",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="https://github.com/ahmadouniass/Subdomains-finder-crtsh",
+    url="https://github.com/ahmadouniass/Subdomains-finder-subhunt",
     project_urls={
-        "Bug Tracker": "https://github.com/ahmadouniass/Subdomains-finder-crtsh/issues",
-        "Documentation": "https://github.com/ahmadouniass/Subdomains-finder-crtsh#readme",
-        "Source": "https://github.com/ahmadouniass/Subdomains-finder-crtsh",
+        "Bug Tracker": "https://github.com/ahmadouniass/Subdomains-finder-subhunt/issues",
+        "Documentation": "https://github.com/ahmadouniass/Subdomains-finder-subhunt#readme",
+        "Source": "https://github.com/ahmadouniass/Subdomains-finder-subhunt",
     },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -62,7 +62,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "crtsh-recon=main:main",
+            "subhunt=main:main",
         ],
     },
     include_package_data=True,

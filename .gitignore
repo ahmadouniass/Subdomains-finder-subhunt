@@ -36,8 +36,8 @@ coverage.xml
 *.cover
 nosetests.xml
 tests/__pycache__/
-crtsh_recon/__pycache__/
-crtsh_recon/.ruff_cache/
+subhunt/__pycache__/
+subhunt/.ruff_cache/
 
 
 # ─── IDE / éditeurs ───────────────────────────────────────

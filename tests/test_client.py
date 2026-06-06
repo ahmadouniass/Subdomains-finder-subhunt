@@ -1,5 +1,5 @@
 """
-tests/test_client.py — Unit tests for crtsh_recon.client (network calls mocked).
+tests/test_client.py — Unit tests for subhunt.client (network calls mocked).
 """
 
 import json
@@ -7,8 +7,8 @@ import pytest
 import requests
 from unittest.mock import patch, MagicMock
 
-from crtsh_recon.client import CRTClient
-from crtsh_recon.exceptions import (
+from subhunt.client import CRTClient
+from subhunt.exceptions import (
     CRTClientError,
     CRTNotFoundError,
     CRTRateLimitError,

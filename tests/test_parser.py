@@ -1,8 +1,8 @@
 """
-tests/test_parser.py — Unit tests for crtsh_recon.parser
+tests/test_parser.py — Unit tests for subhunt.parser
 """
 
-from crtsh_recon.parser import (
+from subhunt.parser import (
     extract_subdomains,
     _strip_wildcard,
     _is_valid_subdomain,
