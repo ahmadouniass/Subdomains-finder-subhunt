@@ -70,7 +70,7 @@ BANNER = r"""
   ███████║╚██████╔╝██████╔╝██║  ██║╚██████╔╝██║ ╚████║   ██║   
   ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   
 """
-_SHORT_BANNER = "  subhunt  |  Subdomain Enumeration via Certificate Transparency logs & HackerTarget"
+_SHORT_BANNER = "  subhunt - Subdomain Enumeration via Certificate Transparency logs & HackerTarget"
 
 
 def print_banner(version: str = "1.0.0") -> None:
