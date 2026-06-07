@@ -7,55 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2024-06-05
-
-### Added
-- **HackerTarget integration** — new `hackertarget_client.py` module queries `https://api.hackertarget.com/hostsearch/` and merges results with crt.sh
-- **crt.sh health check** — `CRTClient.health_check()` pings crt.sh before scanning; if unreachable, HackerTarget is used as automatic fallback
-- **`--disable-hackertarget` CLI flag** — opt out of HackerTarget for crt.sh-only scans
-- **`HackerTargetClientError`** added to the exception hierarchy in `exceptions.py`
-- **`_parse_response()`** extracted as a public function in `hackertarget_client.py` for unit testability
-- **`hackertarget_count`** and **`crtsh_available`** fields added to `ScanResult`
-- **`test_hackertarget.py`** — 23 unit tests for the new client (mocked HTTP)
-- **`test_scanner.py`** fully rewritten — 27 tests covering multi-source merge, fallback logic, health check, error isolation
+## [1.2.0] - 2026-06-06
 
 ### Changed
-- `scanner.py` redesigned to orchestrate multiple sources: health check → crt.sh → HackerTarget → merge → export
-- `ScanConfig` gains `use_hackertarget: bool = True`
-- JSON export metadata now includes `hackertarget_results`, `sources`, and `crtsh_available`
-- `_strip_wildcard()` in `parser.py` now handles both `*.` (X.509) and `%.` (crt.sh SQL) prefixes via `startswith` instead of regex
-- README updated with new architecture, multi-source usage examples, and updated project structure
+- **Projet renommé `crtsh-recon` → `subhunt`** — le nom reflète désormais le périmètre réel de l'outil (multi-source, pas uniquement crt.sh)
+- Package Python renommé `crtsh_recon/` → `subhunt/` — tous les imports mis à jour
+- Commande CLI renommée `crtsh-recon` → `subhunt`
+- `setup.py` : `name`, `entry_points` et `description` mis à jour
+- `logger.py` : namespace de logging mis à jour (`subhunt`)
+- User-Agent HTTP mis à jour dans `client.py` et `hackertarget_client.py`
+- `README.md` et `CHANGELOG.md` mis à jour pour refléter le nouveau nom
+
+---
+
+## [1.1.0] - 2026-06-05
+
+### Added
+- **HackerTarget integration** — nouveau module `hackertarget_client.py` qui interroge `https://api.hackertarget.com/hostsearch/` et merge les résultats avec crt.sh
+- **crt.sh health check** — `CRTClient.health_check()` détecte si crt.sh est down ; fallback automatique sur HackerTarget
+- **`--disable-hackertarget` flag CLI** — opt-out HackerTarget pour un scan crt.sh uniquement
+- **`HackerTargetClientError`** ajouté à la hiérarchie d'exceptions
+- **`_parse_response()`** extrait comme fonction publique dans `hackertarget_client.py`
+- **`hackertarget_count`** et **`crtsh_available`** ajoutés à `ScanResult`
+- `test_hackertarget.py` — 23 tests unitaires
+- `test_scanner.py` entièrement réécrit — 27 tests
+
+### Changed
+- `scanner.py` redesigné : health check → crt.sh → HackerTarget → merge → export
+- `ScanConfig` : nouveau champ `use_hackertarget: bool = True`
+- Export JSON enrichi : `hackertarget_results`, `sources`, `crtsh_available`
+- `_strip_wildcard()` gère `*.` ET `%.` via `startswith`
 
 ### Fixed
-- `logger.py` now catches `(OSError, ValueError)` to handle null-byte paths on all OS
-- CI workflow uses OS-conditional steps to avoid PowerShell `\` line-continuation errors on Windows runners
-- f-string without placeholder in `main.py` (flake8 F541)
+- `logger.py` : `except (OSError, ValueError)` pour tous les OS
+- CI : steps conditionnels par OS (fix PowerShell `\` line-continuation)
+- flake8 F541 dans `main.py`
+- Coverage `scanner.py` : 40% → 98%
 
 ---
 
 ## [1.0.0] - 2026-06-03
 
 ### Added
-- Initial public release of `crtsh-recon`
-- Subdomain enumeration via [crt.sh](https://crt.sh) Certificate Transparency logs
-- Modular architecture: `client`, `parser`, `validator`, `exporter`, `scanner`, `display`, `logger`
-- CLI entry point via `argparse` with flags: `--domain`, `--formats`, `--timeout`, `--retries`, `--backoff`, `--verbose`
-- Multi-format export: TXT, JSON (with metadata), CSV (indexed)
-- Retry strategy with exponential back-off on HTTP 429/5xx errors
-- Colour terminal output with animated spinner (via `colorama`)
-- Rotating file logger under `logs/`
-- `pip install .` support — registers `crtsh-recon` as a global CLI command
-- 117 unit tests across 7 test modules (zero real network calls)
-- CI matrix: Ubuntu / macOS / Windows × Python 3.10 / 3.11 / 3.12
-- Coverage gate: 80% minimum enforced in CI
-- GitHub Release workflow triggered on version tags
-- `CHANGELOG.md` and `LICENSE` (MIT)
+- Release initiale (`crtsh-recon`, renommé `subhunt` en v1.2.0)
+- Énumération de sous-domaines via crt.sh Certificate Transparency logs
+- Architecture modulaire : `client`, `parser`, `validator`, `exporter`, `scanner`, `display`, `logger`
+- CLI argparse, export TXT/JSON/CSV, retry backoff, spinner colorama
+- 117 tests unitaires, CI 3 OS × 3 Python, coverage gate 80%
+- GitHub Release workflow, LICENSE MIT
 
 ---
 
 ## Unreleased
 
 ### Planned
-- DNS resolution of discovered subdomains
-- AlienVault OTX as third enumeration source
-- PyPI release (`pip install crtsh-recon`)
+- Source RapidDNS
+- Résolution DNS des sous-domaines découverts
+- PyPI release (`pip install subhunt`)

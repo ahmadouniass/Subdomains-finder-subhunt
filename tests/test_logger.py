@@ -1,5 +1,5 @@
 """
-tests/test_logger.py — Unit tests for crtsh_recon.logger
+tests/test_logger.py — Unit tests for subhunt.logger
 """
 
 import logging
@@ -7,7 +7,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch
 
-from crtsh_recon.logger import setup_logging, get_logger, _ROOT_LOGGER
+from subhunt.logger import setup_logging, get_logger, _ROOT_LOGGER
 
 
 def _clear_handlers():
@@ -56,7 +56,7 @@ class TestSetupLogging:
 
     def test_log_file_exists_after_setup(self, tmp_path):
         setup_logging(log_dir=str(tmp_path), log_to_file=True)
-        log_file = tmp_path / "crtsh_recon.log"
+        log_file = tmp_path / "subhunt.log"
         assert log_file.exists()
 
     def test_no_file_handler_when_disabled(self):

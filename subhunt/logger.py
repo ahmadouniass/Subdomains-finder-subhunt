@@ -11,7 +11,7 @@ _CONSOLE_FORMAT = "%(message)s"
 _FILE_FORMAT = "%(asctime)s  %(levelname)-8s  %(name)s:%(lineno)d  %(message)s"
 _DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-_ROOT_LOGGER = "crtsh_recon"
+_ROOT_LOGGER = "subhunt"
 
 
 def setup_logging(
@@ -48,7 +48,7 @@ def setup_logging(
         try:
             log_path.mkdir(parents=True, exist_ok=True)
             file_handler = RotatingFileHandler(
-                log_path / "crtsh_recon.log",
+                log_path / "subhunt.log",
                 maxBytes=10 * 1024 * 1024,  # 10 MB
                 backupCount=3,
                 encoding="utf-8",

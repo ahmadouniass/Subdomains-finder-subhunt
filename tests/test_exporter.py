@@ -1,12 +1,12 @@
 """
-tests/test_exporter.py — Unit tests for crtsh_recon.exporter
+tests/test_exporter.py — Unit tests for subhunt.exporter
 """
 
 import csv
 import json
 import pytest
 
-from crtsh_recon.exporter import export_txt, export_json, export_csv, export_results
+from subhunt.exporter import export_txt, export_json, export_csv, export_results
 
 
 DOMAIN = "example.com"

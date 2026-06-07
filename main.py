@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-main.py — CLI entry point for crtsh-recon.
+main.py — CLI entry point for subhunt.
 
 Examples
 --------
@@ -13,21 +13,18 @@ All formats + verbose:
 Custom output directory and timeout:
     python main.py -d example.com --output-dir /tmp/results --timeout 60
 
-Without HackerTarget (CRT.sh only):
-    python main.py -d example.com --disable-hackertarget
-
 After pip install (see setup.py):
-    crtsh-recon -d example.com -f json csv
+    subhunt -d example.com -f json csv
 """
 
 import argparse
 import sys
 
-from crtsh_recon import __version__
-from crtsh_recon.logger import setup_logging
-from crtsh_recon.validator import validate_domain, validate_formats, VALID_FORMATS
-from crtsh_recon.scanner import run_scan, ScanConfig
-from crtsh_recon.display import (
+from subhunt.__init__ import __version__
+from subhunt.logger import setup_logging
+from subhunt.validator import validate_domain, validate_formats, VALID_FORMATS
+from subhunt.scanner import run_scan, ScanConfig
+from subhunt.display import (
     print_banner,
     print_info,
     print_success,
@@ -36,7 +33,7 @@ from crtsh_recon.display import (
     print_summary,
     Spinner,
 )
-from crtsh_recon.exceptions import ValidationError
+from subhunt.exceptions import ValidationError
 
 # ---------------------------------------------------------------------------
 # Argument parser
@@ -45,24 +42,22 @@ from crtsh_recon.exceptions import ValidationError
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="crtsh-recon",
+        prog="subhunt",
         description=(
-            "crtsh-recon — Subdomain enumeration via crt.sh Certificate Transparency logs "
-            "with optional HackerTarget integration.\n"
+            "subhunt — Subdomain enumeration via crt.sh Certificate Transparency logs.\n"
             "Designed for bug bounty hunters and OSINT practitioners."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 examples:
-  crtsh-recon -d example.com
-  crtsh-recon -d example.com -f txt json csv -v
-  crtsh-recon -d example.com --output-dir /tmp/out --timeout 60 --retries 5
-  crtsh-recon -d example.com --disable-hackertarget
-  crtsh-recon -d example.com -f json --no-file-log
+  subhunt -d example.com
+  subhunt -d example.com -f txt json csv -v
+  subhunt -d example.com --output-dir /tmp/out --timeout 60 --retries 5
+  subhunt -d example.com -f json --no-file-log
         """,
     )
 
-    # ── Target ──────────────────────────────────────────────────────────
+    # ── Target ──────────────────────────────────────────────────────────────
     target = parser.add_argument_group("target")
     target.add_argument(
         "-d",
@@ -72,7 +67,7 @@ examples:
         help="Apex domain to enumerate (e.g. example.com)",
     )
 
-    # ── Output ──────────────────────────────────────────────────────────
+    # ── Output ──────────────────────────────────────────────────────────────
     output = parser.add_argument_group("output")
     output.add_argument(
         "-f",
@@ -96,7 +91,7 @@ examples:
         help="Skip file export; print results only",
     )
 
-    # ── Network ──────────────────────────────────────────────────────────
+    # ── Network ─────────────────────────────────────────────────────────────
     network = parser.add_argument_group("network")
     network.add_argument(
         "--timeout",
@@ -120,15 +115,7 @@ examples:
         help="Exponential back-off factor between retries (default: 2.0)",
     )
 
-    # ── Sources ──────────────────────────────────────────────────────────
-    sources = parser.add_argument_group("sources")
-    sources.add_argument(
-        "--disable-hackertarget",
-        action="store_true",
-        help="Disable HackerTarget API; use CRT.sh only (default: enabled)",
-    )
-
-    # ── Logging ──────────────────────────────────────────────────────────
+    # ── Logging ─────────────────────────────────────────────────────────────
     logging_group = parser.add_argument_group("logging")
     logging_group.add_argument(
         "-v",
@@ -148,7 +135,7 @@ examples:
         help="Disable file logging entirely",
     )
 
-    # ── Misc ───────────────────────────────────────────────────────────
+    # ── Misc ────────────────────────────────────────────────────────────────
     parser.add_argument(
         "--version",
         action="version",
@@ -185,7 +172,7 @@ def main() -> int:
         log_to_file=not args.no_file_log,
     )
 
-    # ── Banner ──────────────────────────────────────────────────────────
+    # ── Banner ──────────────────────────────────────────────────────────────
     if not args.no_banner:
         print_banner(__version__)
 
@@ -197,7 +184,7 @@ def main() -> int:
         print_error(str(exc))
         return 2
 
-    # ── Run scan ─────────────────────────────────────────────────────────
+    # ── Run scan ────────────────────────────────────────────────────────────
     config = ScanConfig(
         domain=domain,
         formats=formats,
@@ -205,21 +192,17 @@ def main() -> int:
         timeout=args.timeout,
         retries=args.retries,
         backoff=args.backoff,
-        use_hackertarget=not args.disable_hackertarget,
     )
 
     print_info(f"Target domain   : {domain}")
     print_info(f"Export formats  : {', '.join(formats) if formats else '(none)'}")
     print_info(f"Output directory: {args.output_dir}")
     print_info(f"Timeout / Retries: {args.timeout}s / {args.retries}")
-    print_info(
-        "Sources         : CRT.sh" + (" + HackerTarget" if not args.disable_hackertarget else "")
-    )
 
-    with Spinner(f"Querying sources for *.{domain}"):
+    with Spinner(f"Querying crt.sh for *.{domain}"):
         result = run_scan(config)
 
-    # ── Output ───────────────────────────────────────���──────────────────
+    # ── Output ──────────────────────────────────────────────────────────────
     if not result.success:
         print_error(f"Scan failed: {result.error}")
         return 1
