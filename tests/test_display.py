@@ -176,6 +176,21 @@ class TestPrintSummary:
         out = self._capture(exported={})
         assert "example.com" in out
 
+    def test_hackertarget_count_in_summary(self):
+        out = self._capture(hackertarget_count=10)
+        assert "10" in out
+        assert "HackerTarget" in out
+
+    def test_rapiddns_count_in_summary(self):
+        out = self._capture(rapiddns_count=15)
+        assert "15" in out
+        assert "RapidDNS" in out
+
+    def test_sources_not_shown_when_zero(self):
+        out = self._capture(hackertarget_count=0, rapiddns_count=0)
+        assert "HackerTarget" not in out
+        assert "RapidDNS" not in out
+
 
 # ─── Spinner ──────────────────────────────────────────────────────────────────
 

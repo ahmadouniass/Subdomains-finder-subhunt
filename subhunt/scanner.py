@@ -10,6 +10,7 @@ from typing import Optional
 
 from .client import CRTClient
 from .hackertarget_client import HackerTargetClient
+from .rapiddns_client import RapidDNSClient
 from .parser import extract_subdomains
 from .exporter import export_results
 from .exceptions import CRTReconError
@@ -25,6 +26,7 @@ class ScanResult:
     subdomains: list[str] = field(default_factory=list)
     cert_count: int = 0
     hackertarget_count: int = 0
+    rapiddns_count: int = 0
     exported_files: dict[str, Path] = field(default_factory=dict)
     elapsed: float = 0.0
     error: Optional[str] = None
@@ -46,6 +48,7 @@ class ScanConfig:
     retries: int = 3
     backoff: float = 2.0
     use_hackertarget: bool = True
+    use_rapiddns: bool = True
 
 
 def run_scan(config: ScanConfig) -> ScanResult:
@@ -123,6 +126,25 @@ def run_scan(config: ScanConfig) -> ScanResult:
             except Exception as exc:  # pragma: no cover
                 logger.warning("Unexpected error during HackerTarget fetch: %s", exc)
 
+    # ─── Fetch from RapidDNS (if enabled) ────────────────────────────────────
+    if config.use_rapiddns:
+        with RapidDNSClient(
+            timeout=config.timeout,
+            retries=config.retries,
+            backoff=config.backoff,
+        ) as client:
+            try:
+                logger.debug("Fetching subdomains from RapidDNS for %s", config.domain)
+                rd_subdomains = client.fetch_subdomains(config.domain)
+                result.rapiddns_count = len(rd_subdomains)
+                all_subdomains.update(rd_subdomains)
+                logger.info("RapidDNS: Found %d subdomain(s)", len(rd_subdomains))
+
+            except CRTReconError as exc:
+                logger.warning("RapidDNS fetch failed: %s", exc)
+            except Exception as exc:  # pragma: no cover
+                logger.warning("Unexpected error during RapidDNS fetch: %s", exc)
+
     # ─── Validate we have results ────────────────────────────────────────────
     if not all_subdomains:
         error_msg = (
@@ -143,9 +165,11 @@ def run_scan(config: ScanConfig) -> ScanResult:
         metadata = {
             "cert_records_fetched": result.cert_count,
             "hackertarget_results": result.hackertarget_count,
+            "rapiddns_results": result.rapiddns_count,
             "retries_configured": config.retries,
             "sources": (["crt.sh"] if result.crtsh_available else [])
-            + (["hackertarget"] if config.use_hackertarget else []),
+            + (["hackertarget"] if config.use_hackertarget else [])
+            + (["rapiddns"] if config.use_rapiddns else []),
             "crtsh_available": result.crtsh_available,
         }
         try:

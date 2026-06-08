@@ -4,11 +4,14 @@ main.py — CLI entry point for subhunt.
 
 Examples
 --------
-Basic scan (TXT output by default):
+Basic scan (all sources, TXT output by default):
     python main.py -d example.com
 
 All formats + verbose:
     python main.py -d example.com -f txt json csv -v
+
+crt.sh only:
+    python main.py -d example.com --disable-hackertarget --disable-rapiddns
 
 Custom output directory and timeout:
     python main.py -d example.com --output-dir /tmp/results --timeout 60
@@ -20,7 +23,7 @@ After pip install (see setup.py):
 import argparse
 import sys
 
-from subhunt.__init__ import __version__
+from subhunt import __version__
 from subhunt.logger import setup_logging
 from subhunt.validator import validate_domain, validate_formats, VALID_FORMATS
 from subhunt.scanner import run_scan, ScanConfig
@@ -44,7 +47,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="subhunt",
         description=(
-            "subhunt — Subdomain enumeration via crt.sh Certificate Transparency logs.\n"
+            "subhunt — Multi-source subdomain enumeration tool.\n"
+            "Queries crt.sh, HackerTarget and RapidDNS, merges and deduplicates results.\n"
             "Designed for bug bounty hunters and OSINT practitioners."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -52,8 +56,9 @@ def build_parser() -> argparse.ArgumentParser:
 examples:
   subhunt -d example.com
   subhunt -d example.com -f txt json csv -v
+  subhunt -d example.com --disable-hackertarget --disable-rapiddns
   subhunt -d example.com --output-dir /tmp/out --timeout 60 --retries 5
-  subhunt -d example.com -f json --no-file-log
+  subhunt -d example.com -f json --no-file-log --no-banner
         """,
     )
 
@@ -89,6 +94,19 @@ examples:
         "--no-export",
         action="store_true",
         help="Skip file export; print results only",
+    )
+
+    # ── Sources ─────────────────────────────────────────────────────────────
+    sources = parser.add_argument_group("sources")
+    sources.add_argument(
+        "--disable-hackertarget",
+        action="store_true",
+        help="Disable HackerTarget API (enabled by default)",
+    )
+    sources.add_argument(
+        "--disable-rapiddns",
+        action="store_true",
+        help="Disable RapidDNS scraping (enabled by default)",
     )
 
     # ── Network ─────────────────────────────────────────────────────────────
@@ -184,6 +202,14 @@ def main() -> int:
         print_error(str(exc))
         return 2
 
+    # ── Build sources label ──────────────────────────────────────────────────
+    active_sources = ["CRT.sh"]
+    if not args.disable_hackertarget:
+        active_sources.append("HackerTarget")
+    if not args.disable_rapiddns:
+        active_sources.append("RapidDNS")
+    sources_label = " + ".join(active_sources)
+
     # ── Run scan ────────────────────────────────────────────────────────────
     config = ScanConfig(
         domain=domain,
@@ -192,14 +218,17 @@ def main() -> int:
         timeout=args.timeout,
         retries=args.retries,
         backoff=args.backoff,
+        use_hackertarget=not args.disable_hackertarget,
+        use_rapiddns=not args.disable_rapiddns,
     )
 
-    print_info(f"Target domain   : {domain}")
-    print_info(f"Export formats  : {', '.join(formats) if formats else '(none)'}")
-    print_info(f"Output directory: {args.output_dir}")
+    print_info(f"Target domain    : {domain}")
+    print_info(f"Sources          : {sources_label}")
+    print_info(f"Export formats   : {', '.join(formats) if formats else '(none)'}")
+    print_info(f"Output directory : {args.output_dir}")
     print_info(f"Timeout / Retries: {args.timeout}s / {args.retries}")
 
-    with Spinner(f"Querying crt.sh for *.{domain}"):
+    with Spinner(f"Enumerating subdomains for {domain}"):
         result = run_scan(config)
 
     # ── Output ──────────────────────────────────────────────────────────────
@@ -214,14 +243,16 @@ def main() -> int:
         cert_count=result.cert_count,
         exported=result.exported_files,
         elapsed=result.elapsed,
+        hackertarget_count=result.hackertarget_count,
+        rapiddns_count=result.rapiddns_count,
     )
 
     if result.subdomains:
         print_success(f"Done. {len(result.subdomains)} unique subdomain(s) found for {domain}.")
+        return 0
     else:
         print_error(f"No subdomains discovered for {domain}.")
-
-    return 0
+        return 1
 
 
 if __name__ == "__main__":

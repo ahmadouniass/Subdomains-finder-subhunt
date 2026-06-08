@@ -19,7 +19,7 @@ LONG_DESCRIPTION = (HERE / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="subhunt",
-    version="1.2.0",
+    version="1.3.0",
     author="ahmed_tripping",
     author_email="ahmadouniass2@gmail.com",
     description="Professional subdomain enumeration via crt.sh Certificate Transparency logs",

@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-06-08
+
+### Added
+- **RapidDNS source integration** — added scraping support for `rapiddns.io/subdomain/{domain}?full=1` to query and parse subdomains from their HTML table.
+- **`--disable-rapiddns` CLI flag** — option to turn off RapidDNS scraping.
+- **RapidDNS client tests** — 17 unit tests verifying parsing logic, network error scenarios, and rate limiting.
+- **Scanner integration tests** — updated tests in `test_scanner.py` to cover mock-based multi-source verification and integration robustness.
+
+### Changed
+- CLI Summary layout: updated to print separate counts for `HackerTarget` and `RapidDNS` findings.
+- `ScanConfig`: added `use_rapiddns: bool` (defaulting to True).
+- `ScanResult`: added `rapiddns_count` tracking.
+- JSON output metadata schema: extended to include `rapiddns_results` counter.
+
+### Fixed
+- Fixed formatting in `main.py` and other modules to satisfy CI/CD black/flake8 checks.
+
+---
+
 ## [1.2.0] - 2026-06-06
 
 ### Changed
@@ -61,6 +80,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Planned
-- Source RapidDNS
 - Résolution DNS des sous-domaines découverts
 - PyPI release (`pip install subhunt`)
