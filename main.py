@@ -38,7 +38,6 @@ from subhunt.display import (
 )
 from subhunt.exceptions import ValidationError
 
-
 # ---------------------------------------------------------------------------
 # Argument parser
 # ---------------------------------------------------------------------------
