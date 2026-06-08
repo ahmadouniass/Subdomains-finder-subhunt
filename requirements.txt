@@ -6,3 +6,6 @@ colorama>=0.4.6
 # Testing
 pytest>=7.4.0
 pytest-cov>=4.1.0
+
+#Scraping RapidDNS
+beautifulsoup4>=4.12.0
