@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-`subhunt` is a modular, production-grade OSINT tool that harvests **subdomains** from multiple sources — [crt.sh](https://crt.sh) Certificate Transparency logs and [HackerTarget](https://hackertarget.com) — and merges the results automatically.
+`subhunt` is a modular, production-grade OSINT tool that harvests **subdomains** from multiple passive sources — [crt.sh](https://crt.sh) Certificate Transparency logs, [HackerTarget](https://hackertarget.com), and [RapidDNS](https://rapiddns.io) — and merges the results automatically.
 
 Designed for **bug bounty hunters**, **penetration testers**, and **security researchers** who need fast, reliable, repeatable subdomain enumeration as part of their reconnaissance workflow.
 
@@ -17,9 +17,10 @@ Designed for **bug bounty hunters**, **penetration testers**, and **security res
 
 | Feature | Details |
 |---|---|
-| **Multi-source enumeration** | crt.sh + HackerTarget — merged & deduplicated automatically |
-| **crt.sh health check** | Detects when crt.sh is down and falls back to HackerTarget |
+| **Multi-source enumeration** | crt.sh + HackerTarget + RapidDNS — merged & deduplicated automatically |
+| **crt.sh health check** | Detects when crt.sh is down and falls back to HackerTarget and RapidDNS |
 | **Certificate Transparency** | `https://crt.sh/?q=%.domain&output=json` |
+| **RapidDNS Scraping**        | Scrapes RapidDNS search table using BeautifulSoup4 |
 | **Wildcard cleaning** | Strips `*.` and `%.` prefixes, deduplicates, lowercases, scope-validates |
 | **Multi-format export** | TXT (one per line), JSON (structured + metadata), CSV (indexed) |
 | **Retry & timeout** | Exponential back-off via `urllib3` on 429/5xx |
@@ -27,7 +28,7 @@ Designed for **bug bounty hunters**, **penetration testers**, and **security res
 | **Verbose / debug mode** | Full DEBUG log to console and rotating log file under `logs/` |
 | **Modular architecture** | Each concern in its own module — fully unit-tested |
 | **pip-installable CLI** | `pip install .` registers the `subhunt` command globally |
-| **167 unit tests** | Zero real network calls — all HTTP mocked, coverage ≥ 80% enforced in CI |
+| **197 unit tests** | Zero real network calls — all HTTP mocked, coverage ≥ 80% enforced in CI |
 
 ---
 
@@ -55,16 +56,16 @@ python main.py -d example.com
 
 ## Usage
 
-### Basic scan (crt.sh + HackerTarget)
+### Basic scan (crt.sh + HackerTarget + RapidDNS)
 
 ```bash
 subhunt -d example.com
 ```
 
-### crt.sh only
+### Disable specific sources (e.g. crt.sh only)
 
 ```bash
-subhunt -d example.com --disable-hackertarget
+subhunt -d example.com --disable-hackertarget --disable-rapiddns
 ```
 
 ### All export formats + verbose
@@ -89,7 +90,7 @@ subhunt -d example.com --no-banner --no-file-log
 
 ```
 usage: subhunt [-h] -d DOMAIN [-f FORMAT [FORMAT ...]] [-o DIR]
-               [--no-export] [--disable-hackertarget]
+               [--no-export] [--disable-hackertarget] [--disable-rapiddns]
                [--timeout SEC] [--retries N] [--backoff FACTOR]
                [-v] [--log-dir DIR] [--no-file-log]
                [--version] [--no-banner]
@@ -103,7 +104,8 @@ output:
   --no-export                  Skip file export; print results only
 
 sources:
-  --disable-hackertarget       Use crt.sh only (HackerTarget enabled by default)
+  --disable-hackertarget       Disable HackerTarget API (enabled by default)
+  --disable-rapiddns           Disable RapidDNS scraping (enabled by default)
 
 network:
   --timeout SEC                HTTP request timeout in seconds (default: 30)
@@ -122,7 +124,7 @@ logging:
 
 ```
   [*] Target domain    : example.com
-  [*] Sources          : CRT.sh + HackerTarget
+  [*] Sources          : CRT.sh + HackerTarget + RapidDNS
   [*] Export formats   : txt, json, csv
   [*] Output directory : output
   [*] Timeout / Retries: 30s / 3
@@ -140,6 +142,8 @@ logging:
 
   [*] Domain           : example.com
   [*] Cert records     : 312
+  [*] HackerTarget     : 3
+  [*] RapidDNS         : 2
   [*] Unique subdomains: 5
   [*] Elapsed time     : 2.41s
 
@@ -157,6 +161,7 @@ subhunt/
 │   ├── __init__.py
 │   ├── client.py                  # crt.sh HTTP client (retry / health check)
 │   ├── hackertarget_client.py     # HackerTarget API client
+│   ├── rapiddns_client.py         # RapidDNS client (scraper)
 │   ├── parser.py                  # Extraction & cleaning
 │   ├── validator.py               # Input validation
 │   ├── exporter.py                # TXT / JSON / CSV writers
@@ -168,11 +173,12 @@ subhunt/
 │   ├── conftest.py
 │   ├── test_client.py             # 10 tests
 │   ├── test_hackertarget.py       # 23 tests
+│   ├── test_rapiddns.py           # 17 tests
 │   ├── test_parser.py             # 19 tests
 │   ├── test_validator.py          # 17 tests
 │   ├── test_exporter.py           # 14 tests
-│   ├── test_scanner.py            # 27 tests
-│   ├── test_display.py            # 30 tests
+│   ├── test_scanner.py            # 31 tests
+│   ├── test_display.py            # 33 tests
 │   └── test_logger.py             # 13 tests
 ├── .github/workflows/
 │   ├── ci.yml                     # CI: 3 OS × 3 Python versions
@@ -191,10 +197,11 @@ subhunt/
 1. **Health check** — `CRTClient.health_check()` pings crt.sh (5s timeout). If unreachable, the step is skipped automatically.
 2. **crt.sh query** — `GET https://crt.sh/?q=%.{domain}&output=json` with retry-aware session.
 3. **HackerTarget query** — `GET https://api.hackertarget.com/hostsearch/?q={domain}` (plain-text CSV).
-4. **Parse & clean** — wildcards stripped (`*.` and `%.`), scope-filtered, lowercased, RFC-1123 validated.
-5. **Merge & deduplicate** — results from both sources merged into a `set`, then sorted.
-6. **Export** — timestamped files written under `output/`.
-7. **Display** — colour-coded terminal output with spinner and summary.
+4. **RapidDNS query** — `GET https://rapiddns.io/subdomain/{domain}?full=1` and HTML table parsed (scraping results).
+5. **Parse & clean** — wildcards stripped (`*.` and `%.`), scope-filtered, lowercased, RFC-1123 validated.
+6. **Merge & deduplicate** — results from all sources merged into a `set`, then sorted.
+7. **Export** — timestamped files written under `output/`.
+8. **Display** — colour-coded terminal output with spinner and summary.
 
 ---
 
@@ -218,7 +225,8 @@ pytest tests/ -v --cov=subhunt --cov-report=term-missing --cov-fail-under=80
     "tool": "subhunt",
     "cert_records_fetched": 312,
     "hackertarget_results": 3,
-    "sources": ["crt.sh", "hackertarget"],
+    "rapiddns_results": 2,
+    "sources": ["crt.sh", "hackertarget", "rapiddns"],
     "crtsh_available": true
   },
   "subdomains": [
