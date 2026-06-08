@@ -43,3 +43,9 @@ class ExportError(CRTReconError):
     """Raised when result export fails."""
 
     pass
+
+
+class RapidDNSClientError(CRTReconError):
+    """Raised when RapidDNS scraper encounters an error."""
+    
+    pass
