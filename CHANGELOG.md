@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.0] - Unreleased
+## [1.3.0] - 2026-06-08
 
 ### Added
 - **RapidDNS source integration** — added scraping support for `rapiddns.io/subdomain/{domain}?full=1` to query and parse subdomains from their HTML table.

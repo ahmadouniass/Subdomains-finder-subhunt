@@ -1,4 +1,4 @@
-# subhunt
+# SUBHUNT
 
 > **Professional subdomain enumeration via Certificate Transparency logs & HackerTarget**
 
