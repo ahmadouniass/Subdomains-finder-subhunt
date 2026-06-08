@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 
 from subhunt.scanner import run_scan, ScanConfig, ScanResult
-from subhunt.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitError, HackerTargetClientError, CRTReconError
+from subhunt.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitError, HackerTargetClientError, CRTReconError, RapidDNSClientError
 
 
 # ─── Fixtures & helpers ───────────────────────────────────────────────────────
@@ -18,7 +18,8 @@ from subhunt.exceptions import CRTClientError, CRTNotFoundError, CRTRateLimitErr
 DOMAIN = "example.com"
 CRTSH_SUBS = ["api.example.com", "mail.example.com"]
 HT_SUBS = {"www.example.com", "vpn.example.com"}
-ALL_SUBS = sorted(set(CRTSH_SUBS) | HT_SUBS)
+RD_SUBS = {"rapiddns.example.com", "dns.example.com"}
+ALL_SUBS = sorted(set(CRTSH_SUBS) | HT_SUBS | RD_SUBS)
 
 FAKE_RECORDS = [
     {"name_value": "api.example.com\nmail.example.com", "common_name": "example.com"},
@@ -34,6 +35,7 @@ def _make_config(**kwargs) -> ScanConfig:
         retries=1,
         backoff=0.0,
         use_hackertarget=True,
+        use_rapiddns=False,
     )
     defaults.update(kwargs)
     return ScanConfig(**defaults)
@@ -62,6 +64,17 @@ def _mock_ht_client(subdomains=None, side_effect=None):
     return mock
 
 
+def _mock_rd_client(subdomains=None, side_effect=None):
+    """Return a MagicMock that mimics RapidDNSClient as context manager."""
+    mock = MagicMock()
+    instance = mock.return_value.__enter__.return_value
+    if side_effect:
+        instance.fetch_subdomains.side_effect = side_effect
+    else:
+        instance.fetch_subdomains.return_value = subdomains if subdomains is not None else RD_SUBS
+    return mock
+
+
 # ─── ScanConfig ───────────────────────────────────────────────────────────────
 
 class TestScanConfig:
@@ -74,8 +87,11 @@ class TestScanConfig:
     def test_hackertarget_enabled_by_default(self):
         assert ScanConfig(domain=DOMAIN).use_hackertarget is True
 
+    def test_rapiddns_enabled_by_default(self):
+        assert ScanConfig(domain=DOMAIN).use_rapiddns is True
+
     def test_custom_values(self):
-        cfg = ScanConfig(domain=DOMAIN, formats=["json"], timeout=60, use_hackertarget=False)
+        cfg = ScanConfig(domain=DOMAIN, formats=["json"], timeout=60, use_hackertarget=False, use_rapiddns=False)
         assert cfg.formats == ["json"]
         assert cfg.timeout == 60
         assert cfg.use_hackertarget is False
@@ -95,6 +111,7 @@ class TestScanResult:
         assert r.subdomains == []
         assert r.cert_count == 0
         assert r.hackertarget_count == 0
+        assert r.rapiddns_count == 0
         assert r.exported_files == {}
         assert r.elapsed == 0.0
         assert r.crtsh_available is True
@@ -350,3 +367,49 @@ class TestRunScanErrors:
         result = run_scan(_make_config(formats=[]))
         mock_export.assert_not_called()
         assert result.success is True
+
+
+class TestRapidDNSIntegration:
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.RapidDNSClient")
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
+    def test_rapiddns_enabled_merges_subdomains(self, MockCRT, MockHT, MockRD, mock_extract, mock_export):
+        MockCRT.return_value = _mock_crt_client().return_value
+        MockHT.return_value = _mock_ht_client().return_value
+        MockRD.return_value = _mock_rd_client(subdomains={"rapiddns.example.com"}).return_value
+
+        result = run_scan(_make_config(use_rapiddns=True))
+        assert result.success is True
+        assert "rapiddns.example.com" in result.subdomains
+        assert result.rapiddns_count == 1
+
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.RapidDNSClient")
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
+    def test_rapiddns_disabled_not_called(self, MockCRT, MockHT, MockRD, mock_extract, mock_export):
+        MockCRT.return_value = _mock_crt_client().return_value
+        MockHT.return_value = _mock_ht_client().return_value
+
+        result = run_scan(_make_config(use_rapiddns=False))
+        MockRD.assert_not_called()
+        assert result.rapiddns_count == 0
+
+    @patch("subhunt.scanner.export_results", return_value={})
+    @patch("subhunt.scanner.extract_subdomains", return_value=CRTSH_SUBS)
+    @patch("subhunt.scanner.RapidDNSClient")
+    @patch("subhunt.scanner.HackerTargetClient")
+    @patch("subhunt.scanner.CRTClient")
+    def test_rapiddns_error_does_not_fail_scan(self, MockCRT, MockHT, MockRD, mock_extract, mock_export):
+        MockCRT.return_value = _mock_crt_client().return_value
+        MockHT.return_value = _mock_ht_client().return_value
+        MockRD.return_value = _mock_rd_client(
+            side_effect=RapidDNSClientError("scraping error")
+        ).return_value
+
+        result = run_scan(_make_config(use_rapiddns=True))
+        assert result.success is True
+        assert result.rapiddns_count == 0

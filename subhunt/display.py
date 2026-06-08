@@ -147,20 +147,28 @@ def print_summary(
     cert_count: int,
     exported: dict,
     elapsed: float,
+    hackertarget_count: int = 0,
+    rapiddns_count: int = 0,
 ) -> None:
     """
     Print a final summary block.
 
     Args:
-        domain:     Apex domain.
-        total:      Total unique subdomains found.
-        cert_count: Number of raw cert records fetched.
-        exported:   Mapping of format → file path.
-        elapsed:    Wall-clock seconds for the full run.
+        domain:             Apex domain.
+        total:              Total unique subdomains found.
+        cert_count:         Number of raw cert records fetched.
+        exported:           Mapping of format → file path.
+        elapsed:            Wall-clock seconds for the full run.
+        hackertarget_count: Number of subdomains found via HackerTarget.
+        rapiddns_count:     Number of subdomains found via RapidDNS.
     """
     print_section("Summary")
     print_info(f"Domain           : {bold(domain)}")
     print_info(f"Cert records     : {bold(str(cert_count))}")
+    if hackertarget_count > 0:
+        print_info(f"HackerTarget     : {bold(str(hackertarget_count))}")
+    if rapiddns_count > 0:
+        print_info(f"RapidDNS         : {bold(str(rapiddns_count))}")
     print_info(f"Unique subdomains: {bold(green(str(total)))}")
     print_info(f"Elapsed time     : {bold(f'{elapsed:.2f}s')}")
 

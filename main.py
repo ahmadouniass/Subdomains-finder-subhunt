@@ -244,12 +244,12 @@ def main() -> int:
         cert_count=result.cert_count,
         exported=result.exported_files,
         elapsed=result.elapsed,
+        hackertarget_count=result.hackertarget_count,
+        rapiddns_count=result.rapiddns_count,
     )
 
     if result.subdomains:
-        print_success(
-            f"Done. {len(result.subdomains)} unique subdomain(s) found for {domain}."
-        )
+        print_success(f"Done. {len(result.subdomains)} unique subdomain(s) found for {domain}.")
         return 0
     else:
         print_error(f"No subdomains discovered for {domain}.")

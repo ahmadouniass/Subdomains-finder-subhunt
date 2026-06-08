@@ -22,4 +22,5 @@ from .exceptions import (  # noqa: F401
     CRTRateLimitError,
     ValidationError,
     ExportError,
+    RapidDNSClientError,
 )
