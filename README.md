@@ -37,8 +37,8 @@ Designed for **bug bounty hunters**, **penetration testers**, and **security res
 ### From source (recommended for development)
 
 ```bash
-git clone https://github.com/ahmadouniass/subhunt.git
-cd subhunt
+git clone https://github.com/ahmadouniass/Subdomains-finder-subhunt.git
+cd Subdomains-finder-subhunt
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
