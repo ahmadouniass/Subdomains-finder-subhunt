@@ -12,7 +12,6 @@ Rate limits: no official limit documented; be respectful with retries.
 
 import logging
 import time
-from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -47,15 +46,17 @@ def _build_session(retries: int, backoff: float) -> requests.Session:
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    session.headers.update({
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-    })
+    session.headers.update(
+        {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+        }
+    )
     return session
 
 
@@ -138,9 +139,7 @@ class RapidDNSClient:
         except requests.exceptions.ConnectionError as exc:
             raise RapidDNSClientError(f"Connection failed: {exc}") from exc
         except requests.exceptions.Timeout as exc:
-            raise RapidDNSClientError(
-                f"Request timed out after {self.timeout}s"
-            ) from exc
+            raise RapidDNSClientError(f"Request timed out after {self.timeout}s") from exc
         except requests.exceptions.RequestException as exc:
             raise RapidDNSClientError(f"Unexpected request error: {exc}") from exc
 
@@ -148,14 +147,10 @@ class RapidDNSClient:
         logger.debug("[RapidDNS] HTTP %s (%.2fs)", response.status_code, elapsed)
 
         if response.status_code == 429:
-            raise RapidDNSClientError(
-                "[RapidDNS] Rate limited. Wait before retrying."
-            )
+            raise RapidDNSClientError("[RapidDNS] Rate limited. Wait before retrying.")
 
         if not response.ok:
-            raise RapidDNSClientError(
-                f"[RapidDNS] HTTP {response.status_code} for domain {domain}"
-            )
+            raise RapidDNSClientError(f"[RapidDNS] HTTP {response.status_code} for domain {domain}")
 
         # Check for soft error messages in the page body
         body_lower = response.text.lower()
@@ -165,9 +160,7 @@ class RapidDNSClient:
                 return set()
 
         subdomains = set(_parse_html(response.text))
-        logger.info(
-            "[RapidDNS] Found %d subdomain(s) for %s", len(subdomains), domain
-        )
+        logger.info("[RapidDNS] Found %d subdomain(s) for %s", len(subdomains), domain)
         return subdomains
 
     def close(self) -> None:
