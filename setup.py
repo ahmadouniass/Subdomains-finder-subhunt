@@ -62,7 +62,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "subhunt=main:main",
+            "subhunt=subhunt.cli:main",
         ],
     },
     include_package_data=True,
