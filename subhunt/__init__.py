@@ -10,11 +10,12 @@ Usage (library)::
     print(result.subdomains)
 """
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __author__ = "Ahmadou Niass"
 __license__ = "MIT"
 
 from .scanner import run_scan, ScanConfig, ScanResult  # noqa: F401
+from .prober import probe_subdomains, ProbeResult  # noqa: F401
 from .exceptions import (  # noqa: F401
     CRTReconError,
     CRTClientError,

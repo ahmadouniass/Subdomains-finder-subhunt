@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-06-09
+
+### Added
+- **HTTP probing** — new `subhunt/prober.py` module that checks which discovered
+  subdomains are reachable. Tries HTTPS first, falls back to HTTP.
+  Uses `ThreadPoolExecutor` (20 workers by default) for fast concurrent probing.
+- **`--probe` CLI flag** — opt-in flag to enable HTTP probing after enumeration.
+- **`--probe-timeout SEC`** — per-request timeout for probing (default: 5 s).
+- **`--probe-workers N`** — number of parallel probe threads (default: 20).
+- **`--alive-only` CLI flag** — when combined with `--probe`, only alive
+  subdomains are displayed and exported.
+- **`[ALIVE]` / `[DEAD]` badges** in terminal output, with HTTP status codes
+  shown next to each alive subdomain.
+- **Alive / Dead counts** in the scan summary block.
+- **Enriched CSV export** — when probing is enabled, CSV includes extra columns:
+  `alive`, `status_code`, `url`.
+- **Enriched JSON export** — `probe_results` array added to the JSON payload.
+- **`subhunt/cli.py`** — proper installable CLI entry point (fixes
+  `ModuleNotFoundError` when using `subhunt` command after `pip install`).
+
+### Fixed
+- `setup.py` entry point corrected from `main:main` → `subhunt.cli:main` so
+  the `subhunt` command works correctly after `pip install -e .` or `pip install`.
+
+---
+
 ## [1.3.0] - 2026-06-08
 
 ### Added

@@ -6,7 +6,10 @@ Falls back gracefully when colorama is not installed.
 
 import sys
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from subhunt.prober import ProbeResult
 
 try:
     from colorama import Fore, Style, init as colorama_init
@@ -112,13 +115,18 @@ def print_error(message: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def print_results(subdomains: list[str], domain: str) -> None:
+def print_results(
+    subdomains: list[str],
+    domain: str,
+    probe_results: Optional[list] = None,
+) -> None:
     """
     Render a clean, numbered list of discovered subdomains.
 
     Args:
-        subdomains: Sorted list of subdomain strings.
-        domain:     Apex domain (displayed in the section header).
+        subdomains:    Sorted list of subdomain strings.
+        domain:        Apex domain (displayed in the section header).
+        probe_results: Optional list of ProbeResult from prober module.
     """
     print_section(f"Results for {bold(domain)}")
 
@@ -126,9 +134,15 @@ def print_results(subdomains: list[str], domain: str) -> None:
         print_warning("No subdomains discovered.")
         return
 
+    # Build a quick lookup map if probe data is available
+    probe_map: dict = {}
+    if probe_results:
+        probe_map = {p.subdomain: p for p in probe_results}
+
     width = len(str(len(subdomains)))  # dynamic index column width
     for idx, sub in enumerate(subdomains, start=1):
         index_col = dim(f"  {idx:>{width}}.")
+
         # Highlight the apex part of the subdomain differently
         if sub == domain:
             subdomain_col = yellow(sub)
@@ -136,7 +150,19 @@ def print_results(subdomains: list[str], domain: str) -> None:
             prefix = sub[: len(sub) - len(domain) - 1]
             apex = sub[len(sub) - len(domain) :]
             subdomain_col = green(prefix) + dim(f".{apex}")
-        print(f"{index_col}  {subdomain_col}")
+
+        # Probe badge
+        if probe_map:
+            pr = probe_map.get(sub)
+            if pr and pr.alive:
+                badge = green(f"[{pr.status_code or 'OK'}]")
+            elif pr:
+                badge = red("[DEAD]")
+            else:
+                badge = dim("[?]")
+            print(f"{index_col}  {subdomain_col}  {badge}")
+        else:
+            print(f"{index_col}  {subdomain_col}")
 
     print()
 
@@ -149,6 +175,8 @@ def print_summary(
     elapsed: float,
     hackertarget_count: int = 0,
     rapiddns_count: int = 0,
+    alive_count: int = 0,
+    dead_count: int = 0,
 ) -> None:
     """
     Print a final summary block.
@@ -161,6 +189,8 @@ def print_summary(
         elapsed:            Wall-clock seconds for the full run.
         hackertarget_count: Number of subdomains found via HackerTarget.
         rapiddns_count:     Number of subdomains found via RapidDNS.
+        alive_count:        Alive subdomains after probing (0 = probe not run).
+        dead_count:         Dead subdomains after probing (0 = probe not run).
     """
     print_section("Summary")
     print_info(f"Domain           : {bold(domain)}")
@@ -170,6 +200,9 @@ def print_summary(
     if rapiddns_count > 0:
         print_info(f"RapidDNS         : {bold(str(rapiddns_count))}")
     print_info(f"Unique subdomains: {bold(green(str(total)))}")
+    if alive_count > 0 or dead_count > 0:
+        print_info(f"Alive            : {bold(green(str(alive_count)))}")
+        print_info(f"Dead             : {bold(red(str(dead_count)))}")
     print_info(f"Elapsed time     : {bold(f'{elapsed:.2f}s')}")
 
     if exported:

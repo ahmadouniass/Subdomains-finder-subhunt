@@ -14,6 +14,7 @@ from .rapiddns_client import RapidDNSClient
 from .parser import extract_subdomains
 from .exporter import export_results
 from .exceptions import CRTReconError
+from .prober import probe_subdomains, ProbeResult
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,10 @@ class ScanResult:
     elapsed: float = 0.0
     error: Optional[str] = None
     crtsh_available: bool = True
+    # Probe results (populated only when ScanConfig.probe is True)
+    probe_results: list[ProbeResult] = field(default_factory=list)
+    alive_count: int = 0
+    dead_count: int = 0
 
     @property
     def success(self) -> bool:
@@ -49,6 +54,11 @@ class ScanConfig:
     backoff: float = 2.0
     use_hackertarget: bool = True
     use_rapiddns: bool = True
+    # HTTP probing options
+    probe: bool = False
+    probe_timeout: int = 5
+    probe_workers: int = 20
+    alive_only: bool = False
 
 
 def run_scan(config: ScanConfig) -> ScanResult:
@@ -160,6 +170,24 @@ def run_scan(config: ScanConfig) -> ScanResult:
     # ─── Sort and prepare for export ─────────────────────────────────────────
     result.subdomains = sorted(all_subdomains)
 
+    # ─── HTTP Probing (optional) ─────────────────────────────────────────────
+    if config.probe and result.subdomains:
+        logger.info("Probing %d subdomains (workers=%d, timeout=%ds)…",
+                    len(result.subdomains), config.probe_workers, config.probe_timeout)
+        result.probe_results = probe_subdomains(
+            result.subdomains,
+            timeout=config.probe_timeout,
+            workers=config.probe_workers,
+        )
+        result.alive_count = sum(1 for p in result.probe_results if p.alive)
+        result.dead_count = sum(1 for p in result.probe_results if not p.alive)
+        logger.info("Probe done — alive=%d  dead=%d", result.alive_count, result.dead_count)
+
+        # Filter to alive-only if requested
+        if config.alive_only:
+            alive_set = {p.subdomain for p in result.probe_results if p.alive}
+            result.subdomains = [s for s in result.subdomains if s in alive_set]
+
     # ─── Export results ─────────────────────────────────────────────────────
     if config.formats:
         metadata = {
@@ -171,6 +199,9 @@ def run_scan(config: ScanConfig) -> ScanResult:
             + (["hackertarget"] if config.use_hackertarget else [])
             + (["rapiddns"] if config.use_rapiddns else []),
             "crtsh_available": result.crtsh_available,
+            "probe_enabled": config.probe,
+            "alive_count": result.alive_count,
+            "dead_count": result.dead_count,
         }
         try:
             result.exported_files = export_results(
@@ -179,6 +210,7 @@ def run_scan(config: ScanConfig) -> ScanResult:
                 formats=config.formats,
                 output_dir=config.output_dir,
                 metadata=metadata,
+                probe_results=result.probe_results if config.probe else None,
             )
         except CRTReconError as exc:
             logger.error("Export failed: %s", exc)
