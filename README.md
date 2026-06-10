@@ -39,7 +39,7 @@ Designed for **bug bounty hunters**, **penetration testers**, and **security res
 ```bash
 git clone https://github.com/ahmadouniass/Subdomains-finder-subhunt.git
 cd Subdomains-finder-subhunt
-python -m venv .venv
+python3 -m venv .venv   # Usually for the linux users instead of python
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 pip install -e .
