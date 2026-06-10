@@ -230,3 +230,107 @@ class TestSpinner:
         result = s.__enter__()
         s.__exit__(None, None, None)
         assert result is s
+
+
+# ─── print_results with probe data ───────────────────────────────────────────
+
+
+class TestPrintResultsWithProbe:
+    """Tests for the probe badge display in print_results."""
+
+    def _capture(self, subdomains, domain="example.com", probe_results=None) -> str:
+        buf = StringIO()
+        with patch("sys.stdout", buf):
+            with patch("sys.stderr", StringIO()):
+                print_results(subdomains, domain, probe_results=probe_results)
+        return _strip_ansi(buf.getvalue())
+
+    def test_alive_badge_shown(self):
+        from subhunt.prober import ProbeResult
+        probes = [ProbeResult(subdomain="api.example.com", alive=True, status_code=200)]
+        out = self._capture(["api.example.com"], probe_results=probes)
+        assert "200" in out
+
+    def test_dead_badge_shown(self):
+        from subhunt.prober import ProbeResult
+        probes = [ProbeResult(subdomain="api.example.com", alive=False)]
+        out = self._capture(["api.example.com"], probe_results=probes)
+        assert "DEAD" in out
+
+    def test_mixed_alive_dead(self):
+        from subhunt.prober import ProbeResult
+        probes = [
+            ProbeResult(subdomain="api.example.com", alive=True, status_code=200),
+            ProbeResult(subdomain="dead.example.com", alive=False),
+        ]
+        out = self._capture(["api.example.com", "dead.example.com"], probe_results=probes)
+        assert "200" in out
+        assert "DEAD" in out
+
+    def test_no_probe_results_no_badges(self):
+        out = self._capture(["api.example.com"], probe_results=None)
+        assert "DEAD" not in out
+        assert "200" not in out
+
+    def test_empty_probe_list_no_badges(self):
+        out = self._capture(["api.example.com"], probe_results=[])
+        assert "DEAD" not in out
+
+    def test_unknown_subdomain_shows_question_mark(self):
+        from subhunt.prober import ProbeResult
+        # Probe data exists but not for this subdomain
+        probes = [ProbeResult(subdomain="other.example.com", alive=True, status_code=200)]
+        out = self._capture(["api.example.com"], probe_results=probes)
+        assert "?" in out
+
+    def test_alive_no_status_code_shows_ok(self):
+        from subhunt.prober import ProbeResult
+        probes = [ProbeResult(subdomain="api.example.com", alive=True, status_code=None)]
+        out = self._capture(["api.example.com"], probe_results=probes)
+        assert "OK" in out
+
+    def test_status_403_shown(self):
+        from subhunt.prober import ProbeResult
+        probes = [ProbeResult(subdomain="api.example.com", alive=True, status_code=403)]
+        out = self._capture(["api.example.com"], probe_results=probes)
+        assert "403" in out
+
+
+# ─── print_summary with alive/dead counts ────────────────────────────────────
+
+
+class TestPrintSummaryProbe:
+    def _capture(self, **kwargs) -> str:
+        defaults = dict(
+            domain="example.com",
+            total=5,
+            cert_count=42,
+            exported={},
+            elapsed=1.23,
+        )
+        defaults.update(kwargs)
+        buf = StringIO()
+        with patch("sys.stdout", buf):
+            print_summary(**defaults)
+        return _strip_ansi(buf.getvalue())
+
+    def test_alive_count_shown_when_nonzero(self):
+        out = self._capture(alive_count=10, dead_count=5)
+        assert "Alive" in out
+        assert "10" in out
+
+    def test_dead_count_shown_when_nonzero(self):
+        out = self._capture(alive_count=10, dead_count=5)
+        assert "Dead" in out
+        assert "5" in out
+
+    def test_alive_dead_hidden_when_zero(self):
+        out = self._capture(alive_count=0, dead_count=0)
+        assert "Alive" not in out
+        assert "Dead" not in out
+
+    def test_alive_shown_dead_zero(self):
+        out = self._capture(alive_count=3, dead_count=0)
+        assert "Alive" in out
+        assert "Dead" in out
+
