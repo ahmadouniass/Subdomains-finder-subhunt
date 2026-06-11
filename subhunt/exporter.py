@@ -164,12 +164,15 @@ def export_csv(
                 writer.writerow(["#", "subdomain", "alive", "status_code", "url"])
                 for idx, sub in enumerate(subdomains, start=1):
                     pr = probe_map.get(sub)
-                    writer.writerow([
-                        idx, sub,
-                        pr.alive if pr else "",
-                        pr.status_code if pr else "",
-                        pr.url if pr else "",
-                    ])
+                    writer.writerow(
+                        [
+                            idx,
+                            sub,
+                            pr.alive if pr else "",
+                            pr.status_code if pr else "",
+                            pr.url if pr else "",
+                        ]
+                    )
             else:
                 writer.writerow(["#", "subdomain"])
                 for idx, sub in enumerate(subdomains, start=1):

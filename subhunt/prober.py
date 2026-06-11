@@ -28,9 +28,7 @@ logger = logging.getLogger(__name__)
 _PROTOCOLS = ("https", "http")
 
 # Browser-like UA to avoid being blocked by simple filters.
-_USER_AGENT = (
-    "Mozilla/5.0 (compatible; subhunt/1.4.0; +https://github.com/ahmadouniass/Subdomains-finder-subhunt)"
-)
+_USER_AGENT = "Mozilla/5.0 (compatible; subhunt/1.4.0; +https://github.com/ahmadouniass/Subdomains-finder-subhunt)"
 
 
 @dataclass
@@ -40,9 +38,9 @@ class ProbeResult:
     subdomain: str
     alive: bool = False
     status_code: Optional[int] = None
-    url: Optional[str] = None                  # final URL after redirects
-    redirect_url: Optional[str] = None         # first redirect location (if any)
-    protocol: Optional[str] = None             # "https" or "http"
+    url: Optional[str] = None  # final URL after redirects
+    redirect_url: Optional[str] = None  # first redirect location (if any)
+    protocol: Optional[str] = None  # "https" or "http"
     error: Optional[str] = None
 
 
@@ -67,15 +65,13 @@ def _probe_one(subdomain: str, timeout: int) -> ProbeResult:
                 timeout=timeout,
                 allow_redirects=True,
                 headers=headers,
-                verify=False,   # many subdomains have self-signed certs
+                verify=False,  # many subdomains have self-signed certs
             )
             redirect_url = None
             if resp.history:
                 redirect_url = resp.history[0].headers.get("Location")
 
-            logger.debug(
-                "ALIVE %s  [%d]  final=%s", subdomain, resp.status_code, resp.url
-            )
+            logger.debug("ALIVE %s  [%d]  final=%s", subdomain, resp.status_code, resp.url)
             return ProbeResult(
                 subdomain=subdomain,
                 alive=True,
@@ -119,6 +115,7 @@ def probe_subdomains(
     # Suppress InsecureRequestWarning from urllib3 (verify=False above).
     try:
         import urllib3
+
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     except Exception:
         pass
@@ -126,10 +123,7 @@ def probe_subdomains(
     results: dict[str, ProbeResult] = {}
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        future_to_sub = {
-            executor.submit(_probe_one, sub, timeout): sub
-            for sub in subdomains
-        }
+        future_to_sub = {executor.submit(_probe_one, sub, timeout): sub for sub in subdomains}
         for future in as_completed(future_to_sub):
             sub = future_to_sub[future]
             try:

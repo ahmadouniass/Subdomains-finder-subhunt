@@ -148,14 +148,11 @@ class CRTClient:
             data = response.json()
         except ValueError as exc:
             raise CRTClientError(
-                f"Failed to parse JSON response: {exc}. "
-                f"Raw (first 500 chars): {response.text[:500]}"
+                f"Failed to parse JSON response: {exc}. " f"Raw (first 500 chars): {response.text[:500]}"
             ) from exc
 
         if not isinstance(data, list):
-            raise CRTClientError(
-                f"Unexpected JSON structure (expected list, got {type(data).__name__})"
-            )
+            raise CRTClientError(f"Unexpected JSON structure (expected list, got {type(data).__name__})")
 
         logger.debug("Received %d certificate records", len(data))
         return data

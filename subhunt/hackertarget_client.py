@@ -124,9 +124,7 @@ class HackerTargetClient:
             raise HackerTargetClientError("HackerTarget rate limit reached. Try again later.")
 
         if not response.ok:
-            raise HackerTargetClientError(
-                f"HackerTarget returned HTTP {response.status_code} for domain {domain}"
-            )
+            raise HackerTargetClientError(f"HackerTarget returned HTTP {response.status_code} for domain {domain}")
 
         # HackerTarget returns CSV-like format (domain,ip per line)
         # or "error" message if no results
