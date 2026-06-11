@@ -259,7 +259,7 @@ def main() -> int:
     print_info(f"Output directory : {args.output_dir}")
     print_info(f"Timeout / Retries: {args.timeout}s / {args.retries}")
     if args.probe:
-        print_info(f"Probing          : enabled ({args.probe_workers} workers, {args.probe_timeout}s timeout)")
+        print_info(f"Probing : enabled ({args.probe_workers} workers, {args.probe_timeout}s timeout)")
 
     with Spinner(f"Enumerating subdomains for {domain}"):
         result = run_scan(config)
