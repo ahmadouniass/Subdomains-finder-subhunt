@@ -6,10 +6,8 @@ Falls back gracefully when colorama is not installed.
 
 import sys
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
-if TYPE_CHECKING:
-    from subhunt.prober import ProbeResult
 
 try:
     from colorama import Fore, Style, init as colorama_init

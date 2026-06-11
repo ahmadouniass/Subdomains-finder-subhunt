@@ -176,7 +176,11 @@ def run_scan(config: ScanConfig) -> ScanResult:
 
     # ─── Probe subdomains (if enabled) ───────────────────────────────────────
     if config.probe:
-        result.probe_results = probe_subdomains(result.subdomains, timeout=config.probe_timeout, workers=config.probe_workers)
+        result.probe_results = probe_subdomains(
+            result.subdomains,
+            timeout=config.probe_timeout,
+            workers=config.probe_workers,
+        )
         if config.alive_only:
             alive = {r.subdomain for r in result.probe_results if r.alive}
             result.subdomains = [s for s in result.subdomains if s in alive]
