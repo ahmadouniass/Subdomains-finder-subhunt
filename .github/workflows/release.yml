@@ -35,7 +35,7 @@ jobs:
         run: |
           pytest tests/ -v \
             --tb=short \
-            --cov=crtsh_recon \
+            --cov=subhunt \
             --cov-fail-under=80
 
       - name: Build source distribution & wheel
@@ -51,12 +51,11 @@ jobs:
           python - <<'EOF'
           import re, os
 
-          tag = os.environ["GITHUB_REF_NAME"]          # e.g. v1.0.0
-          version = tag.lstrip("v")                    # e.g. 1.0.0
+          tag = os.environ["GITHUB_REF_NAME"]          # e.g. v1.4.0
+          version = tag.lstrip("v")                    # e.g. 1.4.0
 
           try:
               content = open("CHANGELOG.md").read()
-              # Match the section for this version
               pattern = rf"## \[{re.escape(version)}\].*?(?=\n## |\Z)"
               match = re.search(pattern, content, re.DOTALL)
               notes = match.group(0).strip() if match else f"Release {tag}"
@@ -64,7 +63,6 @@ jobs:
               notes = f"Release {tag}"
 
           with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
-              # GitHub output multiline syntax
               fh.write("NOTES<<EOF_NOTES\n")
               fh.write(notes + "\n")
               fh.write("EOF_NOTES\n")
@@ -76,7 +74,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.VERSION }}
-          name: "crtsh-recon ${{ steps.version.outputs.VERSION }}"
+          name: "subhunt ${{ steps.version.outputs.VERSION }}"
           body: ${{ steps.changelog.outputs.NOTES }}
           draft: false
           prerelease: false
