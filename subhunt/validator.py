@@ -51,8 +51,7 @@ def validate_domain(domain: str) -> str:
 
     if not _APEX_DOMAIN_RE.match(normalised):
         raise ValidationError(
-            f"Invalid domain name: {normalised!r}. "
-            "Expected a valid apex domain (e.g. example.com)."
+            f"Invalid domain name: {normalised!r}. " "Expected a valid apex domain (e.g. example.com)."
         )
 
     return normalised
@@ -75,8 +74,7 @@ def validate_formats(formats: list[str]) -> list[str]:
     invalid = [f for f in normalised if f not in VALID_FORMATS]
     if invalid:
         raise ValidationError(
-            f"Unsupported export format(s): {invalid}. "
-            f"Supported formats: {sorted(VALID_FORMATS)}"
+            f"Unsupported export format(s): {invalid}. " f"Supported formats: {sorted(VALID_FORMATS)}"
         )
     return normalised
 

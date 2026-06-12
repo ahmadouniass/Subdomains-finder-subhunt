@@ -77,16 +77,18 @@ def export_json(
     output_dir: str,
     filename: Optional[str] = None,
     metadata: Optional[dict] = None,
+    probe_results: Optional[list] = None,
 ) -> Path:
     """
     Export *subdomains* as a structured JSON file.
 
     Args:
-        subdomains: Sorted list of subdomain strings.
-        domain:     Apex domain.
-        output_dir: Destination directory.
-        filename:   Override the auto-generated filename.
-        metadata:   Optional dict of extra metadata to embed in the JSON.
+        subdomains:    Sorted list of subdomain strings.
+        domain:        Apex domain.
+        output_dir:    Destination directory.
+        filename:      Override the auto-generated filename.
+        metadata:      Optional dict of extra metadata to embed in the JSON.
+        probe_results: Optional list of ProbeResult objects.
 
     Returns:
         Path to the written file.
@@ -100,11 +102,23 @@ def export_json(
             "domain": domain,
             "total": len(subdomains),
             "generated_at": datetime.now(tz=timezone.utc).isoformat(),
-            "tool": "crtsh-recon",
+            "tool": "subhunt",
             **(metadata or {}),
         },
         "subdomains": subdomains,
     }
+
+    if probe_results:
+        payload["probe_results"] = [
+            {
+                "subdomain": p.subdomain,
+                "alive": p.alive,
+                "status_code": p.status_code,
+                "url": p.url,
+                "protocol": p.protocol,
+            }
+            for p in probe_results
+        ]
 
     content = json.dumps(payload, indent=2, ensure_ascii=False)
     _safe_write(filepath, content)
@@ -118,15 +132,20 @@ def export_csv(
     domain: str,
     output_dir: str,
     filename: Optional[str] = None,
+    probe_results: Optional[list] = None,
 ) -> Path:
     """
-    Export *subdomains* as a two-column CSV file (index, subdomain).
+    Export *subdomains* as a CSV file.
+
+    When *probe_results* is provided, extra columns (alive, status_code, url)
+    are added to the output.
 
     Args:
-        subdomains: Sorted list of subdomain strings.
-        domain:     Apex domain.
-        output_dir: Destination directory.
-        filename:   Override the auto-generated filename.
+        subdomains:    Sorted list of subdomain strings.
+        domain:        Apex domain.
+        output_dir:    Destination directory.
+        filename:      Override the auto-generated filename.
+        probe_results: Optional list of ProbeResult objects.
 
     Returns:
         Path to the written file.
@@ -135,12 +154,29 @@ def export_csv(
     fname = filename or f"{domain}_{_timestamp()}.csv"
     filepath = out_dir / fname
 
+    # Build a probe lookup map for O(1) access
+    probe_map = {p.subdomain: p for p in probe_results} if probe_results else {}
+
     try:
         with filepath.open("w", newline="", encoding="utf-8") as fh:
             writer = csv.writer(fh)
-            writer.writerow(["#", "subdomain"])
-            for idx, sub in enumerate(subdomains, start=1):
-                writer.writerow([idx, sub])
+            if probe_map:
+                writer.writerow(["#", "subdomain", "alive", "status_code", "url"])
+                for idx, sub in enumerate(subdomains, start=1):
+                    pr = probe_map.get(sub)
+                    writer.writerow(
+                        [
+                            idx,
+                            sub,
+                            pr.alive if pr else "",
+                            pr.status_code if pr else "",
+                            pr.url if pr else "",
+                        ]
+                    )
+            else:
+                writer.writerow(["#", "subdomain"])
+                for idx, sub in enumerate(subdomains, start=1):
+                    writer.writerow([idx, sub])
     except OSError as exc:
         raise ExportError(f"Failed to write CSV {filepath}: {exc}") from exc
 
@@ -159,16 +195,18 @@ def export_results(
     formats: list[str],
     output_dir: str = "output",
     metadata: Optional[dict] = None,
+    probe_results: Optional[list] = None,
 ) -> dict[str, Path]:
     """
     Export *subdomains* in every requested format.
 
     Args:
-        subdomains: Sorted list of subdomain strings.
-        domain:     Apex domain.
-        formats:    List of format identifiers (``"txt"``, ``"json"``, ``"csv"``).
-        output_dir: Destination directory.
-        metadata:   Optional extra metadata for the JSON export.
+        subdomains:    Sorted list of subdomain strings.
+        domain:        Apex domain.
+        formats:       List of format identifiers (``"txt"``, ``"json"``, ``"csv"``).
+        output_dir:    Destination directory.
+        metadata:      Optional extra metadata for the JSON export.
+        probe_results: Optional list of ProbeResult for enriched CSV/JSON export.
 
     Returns:
         Mapping of format identifier → written file path.
@@ -180,8 +218,10 @@ def export_results(
 
     _dispatchers = {
         "txt": lambda: export_txt(subdomains, domain, output_dir),
-        "json": lambda: export_json(subdomains, domain, output_dir, metadata=metadata),
-        "csv": lambda: export_csv(subdomains, domain, output_dir),
+        "json": lambda: export_json(
+            subdomains, domain, output_dir, metadata=metadata, probe_results=probe_results
+        ),
+        "csv": lambda: export_csv(subdomains, domain, output_dir, probe_results=probe_results),
     }
 
     for fmt in formats:

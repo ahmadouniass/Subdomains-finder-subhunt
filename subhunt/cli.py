@@ -100,6 +100,33 @@ examples:
         help="Disable RapidDNS scraping (enabled by default)",
     )
 
+    # ── Probing ─────────────────────────────────────────────────────────────
+    probing = parser.add_argument_group("probing")
+    probing.add_argument(
+        "--probe",
+        action="store_true",
+        help="After enumeration, check which subdomains are alive (HTTP/HTTPS)",
+    )
+    probing.add_argument(
+        "--probe-timeout",
+        type=int,
+        default=5,
+        metavar="SEC",
+        help="Timeout per probe request in seconds (default: 5)",
+    )
+    probing.add_argument(
+        "--probe-workers",
+        type=int,
+        default=20,
+        metavar="N",
+        help="Parallel threads for probing (default: 20)",
+    )
+    probing.add_argument(
+        "--alive-only",
+        action="store_true",
+        help="Only display/export alive subdomains (requires --probe)",
+    )
+
     # ── Network ─────────────────────────────────────────────────────────────
     network = parser.add_argument_group("network")
     network.add_argument(
@@ -211,6 +238,10 @@ def main() -> int:
         backoff=args.backoff,
         use_hackertarget=not args.disable_hackertarget,
         use_rapiddns=not args.disable_rapiddns,
+        probe=args.probe,
+        probe_timeout=args.probe_timeout,
+        probe_workers=args.probe_workers,
+        alive_only=args.alive_only,
     )
 
     print_info(f"Target domain    : {domain}")
@@ -218,16 +249,22 @@ def main() -> int:
     print_info(f"Export formats   : {', '.join(formats) if formats else '(none)'}")
     print_info(f"Output directory : {args.output_dir}")
     print_info(f"Timeout / Retries: {args.timeout}s / {args.retries}")
+    if args.probe:
+        print_info(f"Probing          : enabled ({args.probe_workers} workers, {args.probe_timeout}s timeout)")
 
     with Spinner(f"Enumerating subdomains for {domain}"):
         result = run_scan(config)
+
+    if args.probe and result.subdomains:
+        with Spinner(f"Probing {len(result.subdomains)} subdomains"):
+            pass  # probing already done inside run_scan
 
     # ── Output ──────────────────────────────────────────────────────────────
     if not result.success:
         print_error(f"Scan failed: {result.error}")
         return 1
 
-    print_results(result.subdomains, domain)
+    print_results(result.subdomains, domain, probe_results=result.probe_results or None)
     print_summary(
         domain=domain,
         total=len(result.subdomains),
@@ -236,6 +273,8 @@ def main() -> int:
         elapsed=result.elapsed,
         hackertarget_count=result.hackertarget_count,
         rapiddns_count=result.rapiddns_count,
+        alive_count=result.alive_count,
+        dead_count=result.dead_count,
     )
 
     if result.subdomains:

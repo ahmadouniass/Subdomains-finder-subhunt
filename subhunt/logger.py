@@ -70,6 +70,4 @@ def get_logger(name: str) -> logging.Logger:
     Returns:
         A :class:`logging.Logger` instance.
     """
-    return logging.getLogger(
-        f"{_ROOT_LOGGER}.{name}" if not name.startswith(_ROOT_LOGGER) else name
-    )
+    return logging.getLogger(f"{_ROOT_LOGGER}.{name}" if not name.startswith(_ROOT_LOGGER) else name)

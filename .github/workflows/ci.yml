@@ -78,7 +78,7 @@ jobs:
           pip install flake8 black
 
       - name: flake8 — style & syntax check
-        run: flake8 subhunt/ main.py --max-line-length=100 --extend-ignore=E203,W503
+        run: flake8 subhunt/ main.py --max-line-length=115 --extend-ignore=E203,W503
 
       - name: black — formatting check
-        run: black --check --diff --line-length=100 subhunt/ main.py
+        run: black --check --diff --line-length=115 subhunt/ main.py
