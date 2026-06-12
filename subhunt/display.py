@@ -8,7 +8,6 @@ import sys
 import logging
 from typing import Optional
 
-
 try:
     from colorama import Fore, Style, init as colorama_init
 
