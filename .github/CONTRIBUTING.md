@@ -1,6 +1,6 @@
-# Contributing to crtsh-recon
+# Contributing to subhunt
 
-Thank you for your interest in contributing to `crtsh-recon`! This document provides guidelines for development, testing, and submitting contributions.
+Thank you for your interest in contributing to `subhunt`! This document provides guidelines for development, testing, and submitting contributions.
 
 ---
 
@@ -14,8 +14,8 @@ Thank you for your interest in contributing to `crtsh-recon`! This document prov
 ### Clone & Install
 
 ```bash
-git clone https://github.com/ahmadouniass/Subdomains-finder-crtsh.git
-cd Subdomains-finder-crtsh
+git clone https://github.com/ahmadouniass/subhunt.git
+cd subhunt
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
@@ -25,7 +25,7 @@ pip install -e ".[dev]"
 
 ```bash
 pytest tests/ -v
-crtsh-recon --version
+subhunt --version
 ```
 
 ---
@@ -41,7 +41,7 @@ pytest tests/ -v
 ### Run with Coverage Report
 
 ```bash
-pytest tests/ -v --cov=crtsh_recon --cov-report=term-missing
+pytest tests/ -v --cov=subhunt --cov-report=term-missing
 ```
 
 ### Run Specific Test File
@@ -53,14 +53,14 @@ pytest tests/test_parser.py -v
 ### Run Linting Checks
 
 ```bash
-flake8 crtsh_recon/ main.py --max-line-length=100 --extend-ignore=E203,W503
-black --check crtsh_recon/ main.py
+flake8 subhunt/ main.py --max-line-length=100 --extend-ignore=E203,W503
+black --check --diff --line-length=100 subhunt/ main.py
 ```
 
 ### Auto-Format Code
 
 ```bash
-black crtsh_recon/ main.py --line-length=100
+black --line-length=100 subhunt/ main.py
 ```
 
 ---
@@ -77,22 +77,23 @@ black crtsh_recon/ main.py --line-length=100
 
 1. **Run tests locally**
    ```bash
-   pytest tests/ -v --cov=crtsh_recon --cov-fail-under=80
+   pytest tests/ -v --cov=subhunt --cov-fail-under=80
    ```
 
 2. **Format your code**
    ```bash
-   black crtsh_recon/ main.py
+   black --line-length=100 subhunt/ main.py
    ```
 
 3. **Check linting**
    ```bash
-   flake8 crtsh_recon/ main.py --max-line-length=100 --extend-ignore=E203,W503
+   flake8 subhunt/ main.py --max-line-length=100 --extend-ignore=E203,W503
    ```
 
 4. **Add tests for new features**
-   - New functions should have corresponding unit tests
-   - Aim for at least 80% coverage
+   - New functions must have corresponding unit tests
+   - No real network calls in tests — mock all HTTP with `unittest.mock`
+   - Aim for at least **80% coverage** on new modules
 
 ### Required Coverage
 - **Minimum 80%** test coverage across the codebase
@@ -103,31 +104,65 @@ black crtsh_recon/ main.py --line-length=100
 ## Project Structure
 
 ```
-crtsh_recon/
-├── __init__.py           # Package initialization
-├── client.py             # HTTP client with retry logic
-├── parser.py             # Subdomain extraction & cleaning
-├── validator.py          # Input validation
-├── exporter.py           # TXT/JSON/CSV export
-├── scanner.py            # Orchestrator
-├── display.py            # Terminal output
-├── logger.py             # Logging configuration
-└── exceptions.py         # Custom exceptions
+subhunt/
+├── __init__.py               # Package initialization & version
+├── client.py                 # crt.sh HTTP client (retry / health check)
+├── hackertarget_client.py    # HackerTarget API client
+├── rapiddns_client.py        # RapidDNS HTML scraper
+├── parser.py                 # Subdomain extraction & cleaning
+├── validator.py              # Input validation
+├── exporter.py               # TXT / JSON / CSV export
+├── scanner.py                # Multi-source orchestrator
+├── display.py                # Terminal output (colours, spinner)
+├── logger.py                 # Logging configuration
+└── exceptions.py             # Custom exception hierarchy
 
 tests/
-├── test_client.py        # Client tests
-├── test_parser.py        # Parser tests
-├── test_validator.py     # Validator tests
-├── test_exporter.py      # Exporter tests
-├── test_logger.py        # Logger tests
-├── test_display.py       # Display tests
+├── conftest.py               # Shared fixtures
+├── test_client.py            # crt.sh client tests
+├── test_hackertarget.py      # HackerTarget client tests
+├── test_rapiddns.py          # RapidDNS client tests
+├── test_parser.py            # Parser tests
+├── test_validator.py         # Validator tests
+├── test_exporter.py          # Exporter tests
+├── test_scanner.py           # Orchestrator tests
+├── test_display.py           # Display tests
+├── test_logger.py            # Logger tests
 └── __init__.py
 
-main.py                    # CLI entry point
-setup.py                   # Package configuration
-requirements.txt           # Runtime dependencies
-CHANGELOG.md              # Version history
+main.py                       # CLI entry point
+setup.py                      # Package configuration
+requirements.txt              # Runtime dependencies
+CHANGELOG.md                  # Version history
 ```
+
+---
+
+## Adding a New Enumeration Source
+
+`subhunt` is designed to be extended with new sources easily. Here's how to add one:
+
+1. **Create `subhunt/mysource_client.py`**
+   - Follow the same pattern as `hackertarget_client.py` or `rapiddns_client.py`
+   - Implement `fetch_subdomains(domain) -> set[str]`
+   - Use `_build_session()` with retry strategy
+   - Add a dedicated exception in `exceptions.py`
+
+2. **Update `subhunt/scanner.py`**
+   - Add `use_mysource: bool = True` to `ScanConfig`
+   - Add the fetch block in `run_scan()` after existing sources
+
+3. **Update `main.py`**
+   - Add `--disable-mysource` flag in the `sources` group
+   - Pass `use_mysource=not args.disable_mysource` to `ScanConfig`
+
+4. **Write tests in `tests/test_mysource.py`**
+   - Mock all HTTP calls via `patch.object(client.session, "get", ...)`
+   - Cover: success, empty response, 429, 5xx, connection error, timeout
+
+5. **Update docs**
+   - Add the new source to `README.md` features table
+   - Add an entry in `CHANGELOG.md` under `## [Unreleased]`
 
 ---
 
@@ -142,7 +177,7 @@ CHANGELOG.md              # Version history
 
 2. **Implement your feature** with tests
 
-3. **Update CHANGELOG.md**
+3. **Update `CHANGELOG.md`**
    ```markdown
    ## [Unreleased]
 
@@ -164,14 +199,12 @@ CHANGELOG.md              # Version history
 
 2. **Add a test that reproduces the bug**
 
-3. **Fix the bug**
-
-4. **Verify the test passes**
+3. **Fix the bug and verify the test passes**
    ```bash
    pytest tests/ -v
    ```
 
-5. **Update CHANGELOG.md**
+4. **Update `CHANGELOG.md`**
    ```markdown
    ## [Unreleased]
 
@@ -179,7 +212,7 @@ CHANGELOG.md              # Version history
    - Bug description
    ```
 
-6. **Push and create a PR**
+5. **Push and create a PR**
    ```bash
    git push origin fix/bug-description
    ```
@@ -188,12 +221,14 @@ CHANGELOG.md              # Version history
 
 ## Commit Message Guidelines
 
-Use clear, descriptive commit messages:
+Use clear, descriptive commit messages following the Conventional Commits format:
 
-- ✅ `feat: add multi-source fallback for crt.sh`
-- ✅ `fix: handle null-byte paths on Windows`
-- ✅ `docs: update README with examples`
-- ✅ `test: add parser edge case tests`
+- ✅ `feat: add RapidDNS as third enumeration source`
+- ✅ `fix: handle null-byte paths on Windows in logger`
+- ✅ `docs: update README with multi-source usage examples`
+- ✅ `test: add scanner fallback tests for crt.sh down scenario`
+- ✅ `refactor: rename package crtsh_recon → subhunt`
+- ✅ `chore: bump version to 1.3.0`
 - ❌ `fixed stuff`
 - ❌ `update`
 
@@ -203,41 +238,36 @@ Use clear, descriptive commit messages:
 
 ### For Maintainers Only
 
-1. **Update version in `setup.py`**
+1. **Update version in `setup.py` and `subhunt/__init__.py`**
    ```python
-   version="1.1.0",
+   version="1.3.0"
+   __version__ = "1.3.0"
    ```
 
 2. **Update `CHANGELOG.md`**
    ```markdown
-   ## [1.1.0] - 2024-06-15
+   ## [1.3.0] - YYYY-MM-DD
 
    ### Added
    - Feature A
-   - Feature B
 
    ### Fixed
    - Bug X
    ```
 
-3. **Commit changes**
+3. **Commit and tag**
    ```bash
-   git add setup.py CHANGELOG.md
-   git commit -m "chore: bump version to 1.1.0"
-   ```
-
-4. **Create and push tag**
-   ```bash
-   git tag v1.1.0
+   git add setup.py subhunt/__init__.py CHANGELOG.md
+   git commit -m "chore: bump version to 1.3.0"
+   git tag v1.3.0
    git push origin main
-   git push origin v1.1.0
+   git push origin v1.3.0
    ```
 
-5. **GitHub Actions will automatically**
-   - Run full test suite
+4. **GitHub Actions will automatically**
+   - Run the full test suite (3 OS × 3 Python versions)
    - Build `.tar.gz` and `.whl` distributions
-   - Create a GitHub Release with artifacts
-   - Publish to PyPI
+   - Create a GitHub Release with release notes from `CHANGELOG.md`
 
 ---
 
@@ -247,20 +277,20 @@ Use clear, descriptive commit messages:
 - Use the **Bug Report** issue template
 - Include steps to reproduce
 - Provide Python version and OS
-- Attach relevant error logs
+- Attach relevant error logs from `logs/subhunt.log`
 
 ### Feature Requests
 - Use the **Feature Request** issue template
 - Describe the use case
-- Explain why this feature would be helpful
+- Explain why this feature would be helpful for OSINT / bug bounty workflows
 - Suggest implementation approach if possible
 
 ---
 
 ## Questions?
 
-- 📖 Check the [README](../README.md)
-- 🐛 Search [existing issues](https://github.com/ahmadouniass/Subdomains-finder-crtsh/issues)
+- 📖 Check the [README](README.md)
+- 🐛 Search [existing issues](https://github.com/ahmadouniass/subhunt/issues)
 - 💬 Open a new discussion if you have questions
 
 ---
@@ -269,4 +299,4 @@ Use clear, descriptive commit messages:
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-Thank you for making `crtsh-recon` better! 🙏
+Thank you for making `subhunt` better! 🙏
