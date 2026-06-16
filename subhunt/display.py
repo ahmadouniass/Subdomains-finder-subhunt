@@ -70,7 +70,7 @@ BANNER = r"""
   ███████║╚██████╔╝██████╔╝██║  ██║╚██████╔╝██║ ╚████║   ██║
   ╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝
 """
-_SHORT_BANNER = "  subhunt - Subdomain Enumeration via Certificate Transparency logs & HackerTarget"
+_SHORT_BANNER = " Subdomain Enumeration via Certificate Transparency logs & HackerTarget & RapidDNS"
 
 
 def print_banner(version: str = "1.0.0") -> None:
@@ -79,7 +79,7 @@ def print_banner(version: str = "1.0.0") -> None:
         print(cyan(BANNER))
     except UnicodeEncodeError:
         print(cyan(_SHORT_BANNER))
-    print(dim(f"  v{version}   CRT SH |  https://github.com/ahmadouniass/Subdomains-finder-crtsh"))
+    print(dim(f"  v{version}   SUBHUNT |  https://github.com/ahmadouniass/Subdomains-finder-subhunt"))
     print()
 
 
